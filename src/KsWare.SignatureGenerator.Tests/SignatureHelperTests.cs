@@ -1,14 +1,26 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using KsWare.DependencyWalker;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿// ***********************************************************************
+// Assembly         : KsWare.SignatureGenerator.Tests
+// Author           : SchreinerK
+// Created          : 2018-03-12
+//
+// Last Modified By : SchreinerK
+// Last Modified On : 2018-03-13
+// ***********************************************************************
+// <copyright file="SignatureHelperTests.cs" company="KsWare">
+//     Copyright © 2018
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
 
-namespace KsWare.DependencyWalker.Tests {
+using System;
+using System.Reflection;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#pragma warning disable 169
+#pragma warning disable 67
+
+namespace KsWare.SignatureGenerator.Tests {
 
 	[TestClass()]
 	public class SignatureHelperTests {
@@ -116,6 +128,7 @@ namespace KsWare.DependencyWalker.Tests {
 
 		private class Events {
 			public event System.EventHandler A;
+
 			public static event System.EventHandler SA;
 			public event System.EventHandler B { add { } remove { } }
 		}

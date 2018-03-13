@@ -1,43 +1,94 @@
-﻿using System;
-using System.Linq;
+﻿// ***********************************************************************
+// Assembly         : KsWare.SignatureGenerator
+// Author           : SchreinerK
+// Created          : 2018-03-12
+//
+// Last Modified By : SchreinerK
+// Last Modified On : 2018-03-13
+// ***********************************************************************
+// <copyright file="SignatureHelper.cs" company="KsWare">
+//     Copyright © 2018 KsWare. All rights reserved.
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
+
+using System;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace KsWare.DependencyWalker {
+namespace KsWare.SignatureGenerator {
 
 	// ?? System.Reflection.Emit.SignatureHelper
 
+	/// <summary>
+	/// Class SignatureHelper.
+	/// </summary>
 	public class SignatureHelper {
 
+		/// <summary>
+		/// The signature mode
+		/// </summary>
 		private readonly SignatureMode _signatureMode;
 
+		/// <summary>
+		/// If true ignores parameter name
+		/// </summary>
 		private bool IgnoreParameterName;
+		/// <summary>
+		/// If true ignores return type
+		/// </summary>
 		private bool IgnoreReturnType;
 
-		public static SignatureHelper ForCompare = new SignatureHelper(SignatureMode.Compare);
-		public static SignatureHelper ForCompareIgnoreReturnType = new SignatureHelper(SignatureMode.CompareIgnoreReturnType);
-		public static SignatureHelper ForCode = new SignatureHelper(SignatureMode.Code);
-		public static SignatureHelper InheriteDoc = new SignatureHelper(SignatureMode.InheriteDoc);
+		/// <summary>
+		/// For compare
+		/// </summary>
+		public static readonly SignatureHelper ForCompare = new SignatureHelper(SignatureMode.Compare);
+		/// <summary>
+		/// For compare ignore return type
+		/// </summary>
+		public static readonly SignatureHelper ForCompareIgnoreReturnType = new SignatureHelper(SignatureMode.CompareIgnoreReturnType);
+		/// <summary>
+		/// For code
+		/// </summary>
+		public static readonly SignatureHelper ForCode = new SignatureHelper(SignatureMode.Code);
+		/// <summary>
+		/// The inherite document
+		/// </summary>
+		public static readonly SignatureHelper InheriteDoc = new SignatureHelper(SignatureMode.InheriteDoc);
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SignatureHelper"/> class.
+		/// </summary>
+		/// <param name="signatureMode">The signature mode.</param>
 		private SignatureHelper(SignatureMode signatureMode) { _signatureMode = signatureMode; }
 
-		public string Sig(MethodInfo arg) {
+		/// <summary>
+		/// Creates signature for the specified method information.
+		/// </summary>
+		/// <param name="methodInfo">The method information.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(MethodInfo methodInfo) {
 			var sb = new StringBuilder();
 
-			sb.Append(Sig(arg.Attributes));
+			sb.Append(Sig(methodInfo.Attributes));
 
 			if (_signatureMode == SignatureMode.CompareIgnoreReturnType || _signatureMode==SignatureMode.InheriteDoc) { /*skip*/ }
-			else sb.Append(Sig(arg.ReturnType) + " ");
-			sb.Append(arg.Name);
+			else sb.Append(Sig(methodInfo.ReturnType) + " ");
+			sb.Append(methodInfo.Name);
 			sb.Append("(");
-			sb.Append(Sig(arg.GetParameters()));
+			sb.Append(Sig(methodInfo.GetParameters()));
 			sb.Append(")");
 
-			if (sb.ToString() == "protected override void Finalize()") return $"~{arg.DeclaringType.Name}()"; // Desctructor
+			if (sb.ToString() == "protected override void Finalize()") return $"~{methodInfo.DeclaringType.Name}()"; // Desctructor
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified attribute.
+		/// </summary>
+		/// <param name="attr">The attribute.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(MethodAttributes attr) {
 			var sb=new StringBuilder();
 
@@ -47,6 +98,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the access.
+		/// </summary>
+		/// <param name="attr">The attribute.</param>
+		/// <returns>System.String.</returns>
 		public string SigAccess(MethodAttributes attr) {
 			if (_signatureMode == SignatureMode.InheriteDoc) return "";
 			switch (attr & MethodAttributes.MemberAccessMask) {
@@ -59,6 +115,11 @@ namespace KsWare.DependencyWalker {
 			}
 		}
 
+		/// <summary>
+		/// Creates signature for the modifier.
+		/// </summary>
+		/// <param name="attr">The attribute.</param>
+		/// <returns>System.String.</returns>
 		public string SigModifier(MethodAttributes attr) {
 			/*
 			    Final = 32, // 0x00000020
@@ -90,6 +151,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified attribute.
+		/// </summary>
+		/// <param name="attr">The attribute.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(FieldAttributes attr) {
 			var sb = new StringBuilder();
 			sb.Append(SigAccess((MethodAttributes) attr));
@@ -97,6 +163,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the modifier.
+		/// </summary>
+		/// <param name="attr">The attribute.</param>
+		/// <returns>System.String.</returns>
 		public string SigModifier(FieldAttributes attr) {
 			/*
 			Static = 16, // 0x00000010
@@ -122,6 +193,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified constructor information.
+		/// </summary>
+		/// <param name="constructorInfo">The constructor information.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(ConstructorInfo constructorInfo) {
 			var sb = new StringBuilder();
 
@@ -138,6 +214,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified event information.
+		/// </summary>
+		/// <param name="eventInfo">The event information.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(EventInfo eventInfo) {
 			var sb = new StringBuilder();
 			var mi = eventInfo.AddMethod; // TODO
@@ -150,6 +231,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified field information.
+		/// </summary>
+		/// <param name="fieldInfo">The field information.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(FieldInfo fieldInfo) {
 			var sb = new StringBuilder();
 
@@ -162,6 +248,11 @@ namespace KsWare.DependencyWalker {
 //			return $"field {fieldInfo} // not implemented";
 		}
 
+		/// <summary>
+		/// Creates signature for the specified property information.
+		/// </summary>
+		/// <param name="propertyInfo">The property information.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(PropertyInfo propertyInfo) {
 			var sb=new StringBuilder();
 			var getter = propertyInfo.GetMethod;
@@ -206,6 +297,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified parameter infos.
+		/// </summary>
+		/// <param name="parameterInfos">The parameter infos.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(ParameterInfo[] parameterInfos) {
 			if (parameterInfos.Length == 0) return string.Empty;
 			var sb = new StringBuilder();
@@ -213,6 +309,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString(2, sb.Length                   - 2);
 		}
 
+		/// <summary>
+		/// Creates signature for the specified parameter information.
+		/// </summary>
+		/// <param name="parameterInfo">The parameter information.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(ParameterInfo parameterInfo) {
 			var sb = new StringBuilder();
 			//Attributes?
@@ -232,6 +333,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Creates signature for the specified type.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(Type type) {
 			var suffix = "";
 			start:
@@ -283,6 +389,11 @@ namespace KsWare.DependencyWalker {
 			return fn + suffix;
 		}
 
+		/// <summary>
+		/// Creates signature for the specified generic arguments.
+		/// </summary>
+		/// <param name="genericArguments">The generic arguments.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(Type[] genericArguments) {
 			if (genericArguments.Length == 0) return string.Empty;
 			var sb = new StringBuilder();
@@ -290,6 +401,11 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString(2, sb.Length                     - 2);
 		}
 
+		/// <summary>
+		/// Creates signature for the specified member information.
+		/// </summary>
+		/// <param name="memberInfo">The member information.</param>
+		/// <returns>System.String.</returns>
 		public string Sig(MemberInfo memberInfo) {
 			switch (memberInfo.MemberType) {
 				case MemberTypes.Constructor: return Sig((ConstructorInfo) memberInfo);
@@ -304,12 +420,12 @@ namespace KsWare.DependencyWalker {
 
 
 		/// <summary>
-        /// Return the method signature as a string.
-        /// </summary>
-        /// <param name="method">The Method</param>
-        /// <param name="callable">Return as an callable string(public void a(string b) would return a(b))</param>
-        /// <returns>Method signature</returns>
-        public static string Sig2(MethodInfo method, bool callable = false)
+		/// Return the method signature as a string.
+		/// </summary>
+		/// <param name="method">The Method</param>
+		/// <param name="callable">Return as an callable string(public void a(string b) would return a(b))</param>
+		/// <returns>Method signature</returns>
+		public static string Sig2(MethodInfo method, bool callable = false)
         {
             var firstParam = true;
             var sigBuilder = new StringBuilder();
@@ -414,6 +530,9 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// The access prio
+		/// </summary>
 		private static readonly string[] accessPrio = { 
 			 "public",
 			 "protected internal",
@@ -423,12 +542,24 @@ namespace KsWare.DependencyWalker {
 			 "private",
 		};
 
+		/// <summary>
+		/// Maximums the access.
+		/// </summary>
+		/// <param name="a">a.</param>
+		/// <param name="b">The b.</param>
+		/// <returns>System.String.</returns>
 		private string MaxAccess(string a, string b) {
 			var ai = Array.IndexOf(accessPrio,a.Trim());
 			var bi = Array.IndexOf(accessPrio, b.Trim());
 			return accessPrio[Math.Min(ai, bi)];
 		}
 
+		/// <summary>
+		/// Minimums the access.
+		/// </summary>
+		/// <param name="a">a.</param>
+		/// <param name="b">The b.</param>
+		/// <returns>System.String.</returns>
 		private string MinAccess(string a, string b) {
 			var ai = Array.IndexOf(accessPrio, a.Trim());
 			var bi = Array.IndexOf(accessPrio, b.Trim());
