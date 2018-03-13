@@ -38,7 +38,7 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
-		private string Sig(MethodAttributes attr) {
+		public string Sig(MethodAttributes attr) {
 			var sb=new StringBuilder();
 
 			sb.Append(SigAccess(attr));
@@ -47,7 +47,7 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
-		private string SigAccess(MethodAttributes attr) {
+		public string SigAccess(MethodAttributes attr) {
 			if (_signatureMode == SignatureMode.InheriteDoc) return "";
 			switch (attr & MethodAttributes.MemberAccessMask) {
 				case MethodAttributes.Public: return "public ";
@@ -59,7 +59,7 @@ namespace KsWare.DependencyWalker {
 			}
 		}
 
-		private string SigModifier(MethodAttributes attr) {
+		public string SigModifier(MethodAttributes attr) {
 			/*
 			    Final = 32, // 0x00000020
 				Virtual = 64, // 0x00000040
@@ -90,14 +90,14 @@ namespace KsWare.DependencyWalker {
 			return sb.ToString();
 		}
 
-		private string Sig(FieldAttributes attr) {
+		public string Sig(FieldAttributes attr) {
 			var sb = new StringBuilder();
 			sb.Append(SigAccess((MethodAttributes) attr));
 			sb.Append(SigModifier(attr));
 			return sb.ToString();
 		}
 
-		private string SigModifier(FieldAttributes attr) {
+		public string SigModifier(FieldAttributes attr) {
 			/*
 			Static = 16, // 0x00000010
 			InitOnly = 32, // 0x00000020
