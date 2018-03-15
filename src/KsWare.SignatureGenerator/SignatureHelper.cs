@@ -16,6 +16,7 @@ using System;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using MA = System.Reflection.MethodAttributes;
 
 namespace KsWare.SignatureGenerator {
 
@@ -122,13 +123,15 @@ namespace KsWare.SignatureGenerator {
 		/// <returns>System.String.</returns>
 		public string SigModifier(MethodAttributes attr) {
 			/*
+				ReuseSlot = 0,
 			    Final = 32, // 0x00000020
 				Virtual = 64, // 0x00000040
 				HideBySig = 128, // 0x00000080
-				CheckAccessOnOverride = 512, // 0x00000200
+
 				VtableLayoutMask = 256, // 0x00000100
-				ReuseSlot = 0,
 				NewSlot = VtableLayoutMask, // 0x00000100
+
+				CheckAccessOnOverride = 512, // 0x00000200
 				Abstract = 1024, // 0x00000400
 				SpecialName = 2048, // 0x00000800
 				PinvokeImpl = 8192, // 0x00002000
@@ -140,14 +143,16 @@ namespace KsWare.SignatureGenerator {
 			 */
 			if (_signatureMode == SignatureMode.InheriteDoc) return "";
 			var sb = new StringBuilder();
-			const uint @virtual = (uint) MethodAttributes.Virtual;
-			const uint @newslot = (uint) MethodAttributes.NewSlot;
-			if ((attr & MethodAttributes.Static)    > 0U) sb.Append("static ");
-			if ((attr & MethodAttributes.Abstract)  > 0U) sb.Append("abstract ");
-			if ((attr & MethodAttributes.Final)     > 0U) sb.Append("sealed ");
+			const uint @virtual = (uint) MA.Virtual;
+			const uint @newslot = (uint) MA.NewSlot;
+			const MA mask = (MA) 0x0000FFF0;
+			if ((attr & mask) == (MA.HideBySig | MA.Static)) sb.Append("static ");
+			if ((attr & mask) == (MA.HideBySig | MA.Static | MA.PinvokeImpl)) sb.Append("static extern ");
+			if ((attr & MA.Abstract)  > 0U) sb.Append("abstract ");
+			if ((attr & MA.Final)     > 0U) sb.Append("sealed ");
 			if (((uint) attr & @virtual + @newslot) == @virtual + @newslot) sb.Append("virtual ");
 			if (((uint) attr & @virtual + @newslot) == @virtual) sb.Append("override ");
-			if ((attr & MethodAttributes.UnmanagedExport) > 0U) sb.Append("extern "); // TODO ??
+			if ((attr & MA.UnmanagedExport) > 0U) sb.Append("extern "); // TODO ??
 			return sb.ToString();
 		}
 
@@ -278,8 +283,15 @@ namespace KsWare.SignatureGenerator {
 
 			sb.Append(Sig(propertyInfo.PropertyType));
 			sb.Append(" ");
-
-			sb.Append(propertyInfo.Name);
+			if (propertyInfo.Name == "Item" && propertyInfo.GetMethod.GetParameters().Length>0) {
+				sb.Append("this[");
+				sb.Append(Sig(propertyInfo.GetMethod.GetParameters()));
+				sb.Append("]");
+			}
+			else {
+				sb.Append(propertyInfo.Name);
+			}
+			
 			sb.Append(" { ");
 
 			if (propertyInfo.CanRead) {

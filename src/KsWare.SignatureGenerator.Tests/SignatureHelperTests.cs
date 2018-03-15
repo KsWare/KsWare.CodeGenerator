@@ -13,7 +13,10 @@
 // ***********************************************************************
 
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,10 +28,8 @@ namespace KsWare.SignatureGenerator.Tests {
 	[TestClass()]
 	public class SignatureHelperTests {
 
-
-		[DataRow(typeof(string[][,]), "string[][,]")]
-		[DataTestMethod]
-		public void SigType1Test(Type type, string result) { SignatureHelper.ForCompare.Sig(type).Should().Be(result); }
+		private const  BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
+		                                              BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
 		[DataTestMethod]
 		[DataRow(typeof(System.Action<System.EventHandler<bool>>), "System.Action<System.EventHandler<bool>>")]
@@ -44,7 +45,6 @@ namespace KsWare.SignatureGenerator.Tests {
 		[DataRow(typeof(string[,]), "string[,]")]
 		[DataRow(typeof(string[][]), "string[][]")]
 		[DataRow(typeof(string[][,]), "string[][,]")]
-
 		public void SigTypeTest(Type type, string result) {
 			SignatureHelper.ForCompare.Sig(type).Should().Be(result);
 		}
@@ -70,6 +70,9 @@ namespace KsWare.SignatureGenerator.Tests {
 			internal virtual bool VD() => true;
 			protected internal virtual bool VE() => true;
 			public virtual bool VF() => true;
+
+			[DllImport("kernel32.dll",EntryPoint = "GetLastError")]
+			private static extern uint EX();
 		}
 
 		private class MethodModifiersB: MethodModifiers {
@@ -121,8 +124,19 @@ namespace KsWare.SignatureGenerator.Tests {
 		[DataRow(typeof(MethodModifiersC), "VD", "internal sealed override bool VD()")]
 		[DataRow(typeof(MethodModifiersC), "VE", "protected internal sealed override bool VE()")]
 		[DataRow(typeof(MethodModifiersC), "VF", "public sealed override bool VF()")]
+		[DataRow(typeof(MethodModifiers), "EX", "private static extern uint EX()")]
 		public void SigMethodInfoTest(Type type, string name, string result) {
 			var mi=(MethodInfo)type.GetMember(name,BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly)[0];
+			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(MethodModifiers), "SA", "private static bool SA()")] // Private | Static | HideBySig
+		[DataRow(typeof(MethodModifiers), "EX", "private static extern uint EX()")]
+		public void SigMethodInfo2Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name,
+				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
+				BindingFlags.DeclaredOnly)[0];
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 
@@ -302,8 +316,9 @@ namespace KsWare.SignatureGenerator.Tests {
 
 			public void D(params bool[] a) { } // same signature as C
 
-			public void E() { }
-			public void E(bool a) { }
+			public void E(ref bool a) { }
+
+			public void F(out bool a) { a = false; }
 		}
 
 		[DataTestMethod]
@@ -311,6 +326,8 @@ namespace KsWare.SignatureGenerator.Tests {
 		[DataRow(typeof(Parameters), "B", "public void B(bool)")]
 		[DataRow(typeof(Parameters), "C", "public void C(bool[])")]
 		[DataRow(typeof(Parameters), "D", "public void D(bool[])")] // TODO "public void D(params bool[])"
+//TODO		[DataRow(typeof(Parameters), "E", "public void E(ref bool a)")]
+//TODO		[DataRow(typeof(Parameters), "F", "public void F(out bool a)")]
 		public void SigParametersTest(Type type, string name, string result) {
 			var mi = (MethodInfo) type.GetMember(name,
 				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
@@ -318,16 +335,26 @@ namespace KsWare.SignatureGenerator.Tests {
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 
-		[DataTestMethod,Ignore]
+		public class Indexer {
+			public string this[string a] { get { return null; } set { } }
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Indexer), "Item", "public string this[string] { get; set; }")]
+		public void SigIndexerTest(Type type, string name, string result) {
+			// Debug.WriteLine(string.Join("\n",type.GetMembers(AllBindingFlags).Select(m=>m.Name)));
+			var mi = (PropertyInfo) type.GetMember(name, AllBindingFlags)[0];
+			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
+		}
+		
+		[DataTestMethod,Ignore] //TODO AbstractTest
 		[DataRow(typeof(Parameters), "",  "")]
 		public void AbstractTest(Type type, string name, string result) {
-			var mi = (ConstructorInfo) type.GetMember(name,
-				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
-				BindingFlags.DeclaredOnly)[0];
+			var mi = (ConstructorInfo) type.GetMember(name,AllBindingFlags)[0];
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 
-		[DataTestMethod, Ignore]
+		[DataTestMethod, Ignore] //TODO IndexerTest
 		[DataRow(typeof(Parameters), "", "")]
 		public void IndexerTest(Type type, string name, string result) {
 			var mi = (ConstructorInfo) type.GetMember(name,
@@ -336,7 +363,7 @@ namespace KsWare.SignatureGenerator.Tests {
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 
-		[DataTestMethod, Ignore]
+		[DataTestMethod, Ignore] //TODO GenericTest
 		[DataRow(typeof(Parameters), "", "")]
 		public void GenericTest(Type type, string name, string result) {
 			var mi = (ConstructorInfo) type.GetMember(name,
@@ -346,9 +373,7 @@ namespace KsWare.SignatureGenerator.Tests {
 		}
 
 		//TODO abstract
-		//TODO indexer
-		//TODO Constructor parameter
-		//TODO Generic
+		//TODO Attributes
 	}
 
 }
