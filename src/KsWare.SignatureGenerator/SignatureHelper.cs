@@ -331,11 +331,22 @@ namespace KsWare.SignatureGenerator {
 			var sb = new StringBuilder();
 			//Attributes?
 
+//			parameterInfo.IsIn;
+//			parameterInfo.IsOut;
+//			parameterInfo.IsRetval;
+//			parameterInfo.IsLcid;
+//			parameterInfo.HasDefaultValue;
+//TODO		parameterInfo.DefaultValue;
+//			parameterInfo.RawDefaultValue;
+//			parameterInfo.IsOptional;
+
 			switch (_signatureMode) {
 				case SignatureMode.Compare:
 				case SignatureMode.CompareIgnoreReturnType:
 				case SignatureMode.InheriteDoc:
-					sb.Append(Sig(parameterInfo.ParameterType));
+					var sig = Sig(parameterInfo.ParameterType);
+					if (parameterInfo.IsOut) sig = "out " + sig.Substring(4);
+					sb.Append(sig);
 					break;
 				case SignatureMode.Code:
 					sb.Append(Sig(parameterInfo.ParameterType));
@@ -354,10 +365,12 @@ namespace KsWare.SignatureGenerator {
 		public string Sig(Type type) {
 			var t = type; // store the unchanged type
 			var suffix = "";
+			var prefix = "";
 			start:
 			var fn = t.FullName; // possible null on generic types. "T", "T[]"
 			var n = t.Name;
-			if (n.EndsWith("]")) {
+			if (n.EndsWith("]")) { // HasElementType==true
+
 				// []   [,]
 				// C#: string[][,] == Reflection Name = "String[,][]"
 				var match=Regex.Match(n, @"(\[,*\])$",RegexOptions.Compiled);
@@ -365,11 +378,13 @@ namespace KsWare.SignatureGenerator {
 				t = t.GetElementType();
 				goto start;
 			}
-//			if (n.EndsWith("&")) {
-//				suffix = "&" + suffix;
-//				t = type.GetElementType();
-//				goto start;
-//			}
+			if (n.EndsWith("&")) { // HasElementType==true, IsByRef==true
+				// T& => ref T, out T
+				// the "out" is only known by ParameterInfo.IsOut
+				prefix +="ref ";
+				t = t.GetElementType();
+				goto start;
+			}
 
 			if (t.IsGenericParameter) {
 				// "T"
@@ -421,7 +436,7 @@ namespace KsWare.SignatureGenerator {
 				case "System.Decimal": fn = "decimal";break;
 			}
 //			if (fn.StartsWith("System.")) return fn.Substring(7);
-			return fn + suffix;
+			return prefix + fn + suffix;
 		}
 
 		/// <summary>

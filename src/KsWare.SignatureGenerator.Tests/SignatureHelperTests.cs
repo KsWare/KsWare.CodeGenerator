@@ -34,7 +34,7 @@ namespace KsWare.SignatureGenerator.Tests {
 
 		[DataTestMethod]
 		[DataRow(typeof(System.Action<System.EventHandler<bool>>), "System.Action<System.EventHandler<bool>>")]
-		[DataRow(typeof(System.Action<>), "System.Action<>")]
+		[DataRow(typeof(System.Action<>), "System.Action<T>")]
 		[DataRow(typeof(System.Action<bool>), "System.Action<bool>")]
 		[DataRow(typeof(System.Action<bool>[]), "System.Action<bool>[]")]
 		[DataRow(typeof(string), "string")]
@@ -400,6 +400,11 @@ namespace KsWare.SignatureGenerator.Tests {
 			public void PM7(List<T[]> a) { }
 			public void PM8(List<T[,]> a) { }
 			public void PM9(List<T[,]>[] a) { }
+
+			public void PM10(ref T a) { }
+			public void PM11(ref T[] a) { }
+			public void PM12(out T a) { a = default;}
+			public void PM13(out T[] a) { a = default; }
 		}
 
 		[DataTestMethod]
@@ -421,12 +426,17 @@ namespace KsWare.SignatureGenerator.Tests {
 		[DataRow(typeof(GenericClass1<>), "PM7", "public void PM7(System.Collections.Generic.List<T[]>)")]
 		[DataRow(typeof(GenericClass1<>), "PM8", "public void PM8(System.Collections.Generic.List<T[,]>)")]
 		[DataRow(typeof(GenericClass1<>), "PM9", "public void PM9(System.Collections.Generic.List<T[,]>[])")]
+		[DataRow(typeof(GenericClass1<>), "PM10", "public void PM10(ref T)")]
+		[DataRow(typeof(GenericClass1<>), "PM11", "public void PM11(ref T[])")]
+		[DataRow(typeof(GenericClass1<>), "PM12", "public void PM12(out T)")]
+		[DataRow(typeof(GenericClass1<>), "PM13", "public void PM13(out T[])")]
 		public void SigGenericMethodTest(Type type, string name, string result) {
 			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 		[DataTestMethod]
-		[DataRow(typeof(GenericClass1<>), "RM2", "public T[] RM2()")]
+		[DataRow(typeof(GenericClass1<>), "PM10", "public void PM10(ref T)")]
+		[DataRow(typeof(GenericClass1<>), "PM12", "public void PM12(out T)")]
 		public void SigGenericMethod1Test(Type type, string name, string result) {
 			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
@@ -453,10 +463,11 @@ namespace KsWare.SignatureGenerator.Tests {
 		#region
 
 		[DataTestMethod] 
-		[DataRow(typeof(IGenericInterface1<>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface1<>")]
-		[DataRow(typeof(IGenericInterface2<,>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface2<, >")]
-		[DataRow(typeof(GenericClass1<>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.GenericClass1<>")]
+		[DataRow(typeof(IGenericInterface1<>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface1<T>")]
+		[DataRow(typeof(IGenericInterface2<,>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface2<T1, T2>")]
+		[DataRow(typeof(GenericClass1<>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.GenericClass1<T>")]
 		public void GenericType_ForCompare_Test(Type type, string result) {
+			//TODO revise <> and <T> for compare because T is a name which can be changed without loose of compatibility
 			SignatureHelper.ForCompare.Sig(type).Should().Be(result);
 		}
 
