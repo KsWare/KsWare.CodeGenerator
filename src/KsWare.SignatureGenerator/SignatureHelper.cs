@@ -13,6 +13,7 @@
 // ***********************************************************************
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -146,8 +147,8 @@ namespace KsWare.SignatureGenerator {
 			const uint @virtual = (uint) MA.Virtual;
 			const uint @newslot = (uint) MA.NewSlot;
 			const MA mask = (MA) 0x0000FFF0;
-			if ((attr & mask) == (MA.HideBySig | MA.Static)) sb.Append("static ");
 			if ((attr & mask) == (MA.HideBySig | MA.Static | MA.PinvokeImpl)) sb.Append("static extern ");
+			else if ((attr & MA.Static) >0) sb.Append("static ");
 			if ((attr & MA.Abstract)  > 0U) sb.Append("abstract ");
 			if ((attr & MA.Final)     > 0U) sb.Append("sealed ");
 			if (((uint) attr & @virtual + @newslot) == @virtual + @newslot) sb.Append("virtual ");
@@ -351,34 +352,56 @@ namespace KsWare.SignatureGenerator {
 		/// <param name="type">The type.</param>
 		/// <returns>System.String.</returns>
 		public string Sig(Type type) {
+			var t = type; // store the unchanged type
 			var suffix = "";
 			start:
-			var fn = type.FullName;
-			var n = type.Name;
+			var fn = t.FullName; // possible null on generic types. "T", "T[]"
+			var n = t.Name;
 			if (n.EndsWith("]")) {
 				// []   [,]
 				// C#: string[][,] == Reflection Name = "String[,][]"
 				var match=Regex.Match(n, @"(\[,*\])$",RegexOptions.Compiled);
 				suffix = suffix + match.Value;
-				type = type.GetElementType();
+				t = t.GetElementType();
 				goto start;
 			}
 //			if (n.EndsWith("&")) {
 //				suffix = "&" + suffix;
-//				type = type.GetElementType();
+//				t = type.GetElementType();
 //				goto start;
 //			}
 
-			if (type.IsGenericType) {
+			if (t.IsGenericParameter) {
+				// "T"
+				fn = n;
+			} 
+			else if (t.IsConstructedGenericType) {
+				// "KsWare.SignatureGenerator.Tests.SignatureHelperTests+IGenericInterface1`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
 				var sb   = new StringBuilder();
-				var gt   = type.GetGenericTypeDefinition();
+				var gt   = t.GetGenericTypeDefinition();
 				var gtfn = gt.FullName.Substring(0, gt.FullName.IndexOf("`"));
 				sb.Append(gtfn);
 				sb.Append("<");
-				sb.Append(Sig(type.GetGenericArguments()));
+				sb.Append(Sig(t.GetGenericArguments()));
 				sb.Append(">");
-				return sb + suffix;
+				fn = sb.ToString();
 			}
+			else if (t.IsGenericTypeDefinition) {
+				// "KsWare.SignatureGenerator.Tests.SignatureHelperTests+IGenericInterface1`1"
+				var sb   = new StringBuilder();
+				var gt   = t.GetGenericTypeDefinition();
+				var gtfn = gt.FullName.Substring(0, gt.FullName.IndexOf("`"));
+				sb.Append(gtfn);
+				sb.Append("<");
+				sb.Append(Sig(t.GetGenericArguments()));
+				sb.Append(">");
+				fn = sb.ToString();
+			}
+
+			if(fn==null) Debugger.Break();
+			if(fn.Contains("`")) Debugger.Break();
+
+			fn = fn.Replace("+", ".");
 
 			switch (fn) {
 				case "System.Void":    fn = "void";   break;
@@ -555,11 +578,12 @@ namespace KsWare.SignatureGenerator {
 		};
 
 		/// <summary>
-		/// Maximums the access.
+		/// Returns the access value with the heigher prio
 		/// </summary>
-		/// <param name="a">a.</param>
-		/// <param name="b">The b.</param>
-		/// <returns>System.String.</returns>
+		/// <param name="a">The 1st access value.</param>
+		/// <param name="b">The 2nd access value.</param>
+		/// <returns>The access value with the heigher prio.</returns>
+		/// <remarks><para>The access values are one of <c>public</c>, <c>protected internal</c>, <c>protected</c>, <c>internal</c>, <c>protected private</c>, <c>private</c> </para></remarks>
 		private string MaxAccess(string a, string b) {
 			var ai = Array.IndexOf(accessPrio,a.Trim());
 			var bi = Array.IndexOf(accessPrio, b.Trim());
@@ -567,25 +591,17 @@ namespace KsWare.SignatureGenerator {
 		}
 
 		/// <summary>
-		/// Minimums the access.
+		/// Returns the access value with the lower prio
 		/// </summary>
-		/// <param name="a">a.</param>
-		/// <param name="b">The b.</param>
-		/// <returns>System.String.</returns>
+		/// <param name="a">The 1st access value.</param>
+		/// <param name="b">The 2nd access value.</param>
+		/// <returns>The access value with the heigher prio.</returns>
+		/// <remarks><para>The access values are one of <c>public</c>, <c>protected internal</c>, <c>protected</c>, <c>internal</c>, <c>protected private</c>, <c>private</c> </para></remarks>
 		private string MinAccess(string a, string b) {
 			var ai = Array.IndexOf(accessPrio, a.Trim());
 			var bi = Array.IndexOf(accessPrio, b.Trim());
 			return accessPrio[Math.Max(ai, bi)];
 		}
-
-
-	}
-
-	internal enum SignatureMode {
-		Compare,
-		Code,
-		CompareIgnoreReturnType,
-		InheriteDoc
 	}
 
 }

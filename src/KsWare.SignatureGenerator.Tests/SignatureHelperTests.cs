@@ -13,6 +13,7 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -141,10 +142,9 @@ namespace KsWare.SignatureGenerator.Tests {
 		}
 
 		private class Events {
-			public event System.EventHandler A;
-
-			public static event System.EventHandler SA;
-			public event System.EventHandler B { add { } remove { } }
+			public event System.EventHandler A;								//                 | HideBySig | SpecialName
+			public event System.EventHandler B { add { } remove { } }		//                 | HideBySig | SpecialName
+			public static event System.EventHandler SA;						//          Static | HideBySig | SpecialName
 		}
 
 		[DataTestMethod]
@@ -363,17 +363,126 @@ namespace KsWare.SignatureGenerator.Tests {
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 
-		[DataTestMethod, Ignore] //TODO GenericTest
-		[DataRow(typeof(Parameters), "", "")]
-		public void GenericTest(Type type, string name, string result) {
-			var mi = (ConstructorInfo) type.GetMember(name,
-				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
-				BindingFlags.DeclaredOnly)[0];
+		#region
+
+		public interface IPublicInterface {}
+		internal interface IInternalInterface { }
+		private interface IPrivateInterface { }
+
+		public class PublicClass { }
+		internal class InternalClass { }
+		private class PrivateClass { }
+
+		public abstract class PublicAbstractClass { }
+		public sealed class PublicSealedClass { }
+
+		public interface IGenericInterface1<T> { }
+
+		public interface IGenericInterface2<T1, T2> { }
+
+		public class GenericClass1<T> {
+			public T RM1() { return default; }
+			public T[] RM2() { return default; }
+			public T[,] RM3() { return default; }
+			public List<T> RM4() { return default; }
+			public List<T>[] RM5() { return default; }
+			public List<T>[,] RM6() { return default; }
+			public List<T[]> RM7() { return default; }
+			public List<T[,]> RM8() { return default; }
+			public List<T[,]>[] RM9() { return default; }
+
+			public void PM1(T a) { }
+			public void PM2(T[] a) { }
+			public void PM3(T[,] a) { }
+			public void PM4(List<T> a) { }
+			public void PM5(List<T>[] a) { }
+			public void PM6(List<T>[,] a) { }
+			public void PM7(List<T[]> a) { }
+			public void PM8(List<T[,]> a) { }
+			public void PM9(List<T[,]>[] a) { }
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(GenericClass1<>), "RM1", "public T RM1()")]
+		[DataRow(typeof(GenericClass1<>), "RM2", "public T[] RM2()")]
+		[DataRow(typeof(GenericClass1<>), "RM3", "public T[,] RM3()")]
+		[DataRow(typeof(GenericClass1<>), "RM4", "public System.Collections.Generic.List<T> RM4()")]
+		[DataRow(typeof(GenericClass1<>), "RM5", "public System.Collections.Generic.List<T>[] RM5()")]
+		[DataRow(typeof(GenericClass1<>), "RM6", "public System.Collections.Generic.List<T>[,] RM6()")]
+		[DataRow(typeof(GenericClass1<>), "RM7", "public System.Collections.Generic.List<T[]> RM7()")]
+		[DataRow(typeof(GenericClass1<>), "RM8", "public System.Collections.Generic.List<T[,]> RM8()")]
+		[DataRow(typeof(GenericClass1<>), "RM9", "public System.Collections.Generic.List<T[,]>[] RM9()")]
+		[DataRow(typeof(GenericClass1<>), "PM1", "public void PM1(T)")]
+		[DataRow(typeof(GenericClass1<>), "PM2", "public void PM2(T[])")]
+		[DataRow(typeof(GenericClass1<>), "PM3", "public void PM3(T[,])")]
+		[DataRow(typeof(GenericClass1<>), "PM4", "public void PM4(System.Collections.Generic.List<T>)")]
+		[DataRow(typeof(GenericClass1<>), "PM5", "public void PM5(System.Collections.Generic.List<T>[])")]
+		[DataRow(typeof(GenericClass1<>), "PM6", "public void PM6(System.Collections.Generic.List<T>[,])")]
+		[DataRow(typeof(GenericClass1<>), "PM7", "public void PM7(System.Collections.Generic.List<T[]>)")]
+		[DataRow(typeof(GenericClass1<>), "PM8", "public void PM8(System.Collections.Generic.List<T[,]>)")]
+		[DataRow(typeof(GenericClass1<>), "PM9", "public void PM9(System.Collections.Generic.List<T[,]>[])")]
+		public void SigGenericMethodTest(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
+			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
+		}
+		[DataTestMethod]
+		[DataRow(typeof(GenericClass1<>), "RM2", "public T[] RM2()")]
+		public void SigGenericMethod1Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
 			SignatureHelper.ForCompare.Sig(mi).Should().Be(result);
 		}
 
+		[DataTestMethod,Ignore] //TODO
+		[DataRow(typeof(IPublicInterface), "public interface IPublicInterface")]
+		[DataRow(typeof(IInternalInterface), "internal interface IInternalInterface")]
+		[DataRow(typeof(IPrivateInterface), "private interface IPrivateInterface")]
+		[DataRow(typeof(PublicClass), "public interface PublicClass")]
+		[DataRow(typeof(InternalClass), "internal interface InternalClass")]
+		[DataRow(typeof(PrivateClass), "private interface PrivateClass")]
+		[DataRow(typeof(PublicAbstractClass), "public abstract class PublicAbstractClass")]
+		[DataRow(typeof(PublicSealedClass), "public sealed class PublicSealedClass")]
+		[DataRow(typeof(IGenericInterface1<>), "public interface IGenericInterface1<T>")]
+		[DataRow(typeof(IGenericInterface2<,>), "public interface IGenericInterface2<T1, T2>")]
+		[DataRow(typeof(GenericClass1<>), "public class GenericClass1<T>")]
+		public void TypeCodeTest(Type type, string result) {
+			SignatureHelper.ForCode.Sig(type).Should().Be(result);
+		}
+
+		#endregion
+
+		#region
+
+		[DataTestMethod] 
+		[DataRow(typeof(IGenericInterface1<>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface1<>")]
+		[DataRow(typeof(IGenericInterface2<,>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface2<, >")]
+		[DataRow(typeof(GenericClass1<>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.GenericClass1<>")]
+		public void GenericType_ForCompare_Test(Type type, string result) {
+			SignatureHelper.ForCompare.Sig(type).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(IGenericInterface1<int>     ), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface1<int>")]
+		[DataRow(typeof(IGenericInterface2<int,bool>), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.IGenericInterface2<int, bool>")]
+		[DataRow(typeof(GenericClass1<int>          ), "KsWare.SignatureGenerator.Tests.SignatureHelperTests.GenericClass1<int>")]
+		public void GenericTypeName2Test(Type type, string result) {
+			SignatureHelper.ForCompare.Sig(type).Should().Be(result);
+		}
+
+		#endregion
 		//TODO abstract
 		//TODO Attributes
 	}
+
+	internal interface IInternalInterface{}
+
+	internal interface IInternalGenericInterface1<T> { }
+
+	internal interface IInternalGenericInterface2<T1,T2> { }
+
+	internal class InternalClass { }
+
+	internal class InternalGenericClass1<T> { }
+
+	internal class InternalGenericClass2<T1, T2> { }
 
 }
