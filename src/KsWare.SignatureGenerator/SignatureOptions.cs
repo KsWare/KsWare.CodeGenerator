@@ -73,4 +73,24 @@ namespace KsWare.SignatureGenerator {
 			}
 		}
 	}
+
+	public class PropertySignatureOptions {
+
+		public static PropertySignatureOptions Create(SignatureMode signatureMode) {
+			return new PropertySignatureOptions{};
+		}
+	}
+
+	public class FieldSignatureOptions {
+
+		public static FieldSignatureOptions Create(SignatureMode signatureMode) {
+			return new FieldSignatureOptions { };
+		}
+	}
+	public class EventSignatureOptions {
+
+		public static EventSignatureOptions Create(SignatureMode signatureMode) {
+			return new EventSignatureOptions { };
+		}
+	}
 }

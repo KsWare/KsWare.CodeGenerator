@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace KsWare.SignatureGenerator.SignatureHelpers {
 
+	// Access           Namespace             Name    GenericInfo
+	// public interface Full.Namespace.Nested.Interface<T>
+	// <T>
+	// <>
+	// <type>
+	// suffix[]
+
 	public class TypeSignature : BaseSignature {
 
 		public TypeSignature(SignatureHelper signatureHelper) : base(signatureHelper) { }
@@ -17,7 +24,15 @@ namespace KsWare.SignatureGenerator.SignatureHelpers {
 		/// </summary>
 		/// <param name="type">The type.</param>
 		/// <returns>System.String.</returns>
-		public string Sig(Type type) {
+		public string Sig(Type type) => Sig(type, TypeSignatureOptions.Create(SignatureMode));
+
+		/// <summary>
+		/// Creates signature for the specified type.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <param name="options">The signature options.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(Type type, TypeSignatureOptions options) { 
 			var t = type; // store the unchanged type
 			var suffix = "";
 			var prefix = "";

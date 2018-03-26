@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MethodSignatureOptions.cs" />
     <Compile Include="SignatureHelpers\BaseSignature.cs" />
     <Compile Include="SignatureHelpers\~TemplateInfoSignature.cs" />
     <Compile Include="SignatureHelpers\EventInfoSignature.cs" />

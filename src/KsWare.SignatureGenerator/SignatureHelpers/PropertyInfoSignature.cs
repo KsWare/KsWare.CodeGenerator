@@ -16,7 +16,15 @@ namespace KsWare.SignatureGenerator.SignatureHelpers {
 		/// </summary>
 		/// <param name="propertyInfo">The property information.</param>
 		/// <returns>System.String.</returns>
-		public string Sig(PropertyInfo propertyInfo) {
+		public string Sig(PropertyInfo propertyInfo) => Sig(propertyInfo, PropertySignatureOptions.Create(SignatureMode));
+
+		/// <summary>
+		/// Creates signature for the specified property information.
+		/// </summary>
+		/// <param name="propertyInfo">The property information.</param>
+		/// <param name="options">The signature options.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(PropertyInfo propertyInfo, PropertySignatureOptions options) {
 			var sb     = new StringBuilder();
 			var getter = propertyInfo.GetMethod;
 			var setter = propertyInfo.SetMethod;

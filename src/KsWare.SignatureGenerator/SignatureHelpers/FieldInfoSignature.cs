@@ -16,7 +16,15 @@ namespace KsWare.SignatureGenerator.SignatureHelpers {
 		/// </summary>
 		/// <param name="fieldInfo">The field information.</param>
 		/// <returns>System.String.</returns>
-		public string Sig(FieldInfo fieldInfo) {
+		public string Sig(FieldInfo fieldInfo) => Sig(fieldInfo, FieldSignatureOptions.Create(SignatureMode));
+
+		/// <summary>
+		/// Creates signature for the specified field information.
+		/// </summary>
+		/// <param name="fieldInfo">The field information.</param>
+		/// <param name="options">The signature options.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(FieldInfo fieldInfo, FieldSignatureOptions options) {
 			var sb = new StringBuilder();
 
 			sb.Append($"{SignatureHelper.Sig(fieldInfo.Attributes)}");

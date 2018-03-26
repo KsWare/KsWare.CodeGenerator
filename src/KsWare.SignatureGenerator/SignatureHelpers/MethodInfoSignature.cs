@@ -16,22 +16,29 @@ namespace KsWare.SignatureGenerator.SignatureHelpers {
 		/// </summary>
 		/// <param name="methodInfo">The method information.</param>
 		/// <returns>System.String.</returns>
-		public string Sig(MethodInfo methodInfo) {
+		public string Sig(MethodInfo methodInfo) => Sig(methodInfo, MethodSignatureOptions.Create(SignatureMode));
+
+		/// <summary>
+		/// Creates signature for the specified method information.
+		/// </summary>
+		/// <param name="methodInfo">The method information.</param>
+		/// <param name="options">The signature options.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(MethodInfo methodInfo, MethodSignatureOptions options) {
 			var sb = new StringBuilder();
 
-			sb.Append(SignatureHelper.Sig(methodInfo.Attributes));
+			if (options.Access    ) sb.Append(SignatureHelper.SigAccess  (methodInfo.Attributes));
+			if (options.Modifiers ) sb.Append(SignatureHelper.SigModifier(methodInfo.Attributes));
+			if (options.ReturnType) sb.Append(SignatureHelper.Sig        (methodInfo.ReturnType) + " ");
+			if (options.Name      ) sb.Append(methodInfo.Name);
 
-			if (SignatureMode == SignatureMode.CompareIgnoreReturnType ||
-			    SignatureMode == SignatureMode.InheriteDoc) { /*skip*/
-			}
-			else sb.Append(SignatureHelper.Sig(methodInfo.ReturnType) + " ");
-			sb.Append(methodInfo.Name);
+			//TODO use options
 			sb.Append("(");
 			sb.Append(SignatureHelper.Sig(methodInfo.GetParameters()));
 			sb.Append(")");
 
 			if (sb.ToString() == "protected override void Finalize()")
-				return $"~{methodInfo.DeclaringType.Name}()"; // Desctructor
+				return $"~{methodInfo.DeclaringType.Name}()"; // Destructor
 			return sb.ToString();
 		}
 
