@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using KsWare.SignatureGenerator.SignatureHelpers;
 using MA = System.Reflection.MethodAttributes;
 
 namespace KsWare.SignatureGenerator {
@@ -26,7 +27,14 @@ namespace KsWare.SignatureGenerator {
 	/// <summary>
 	/// Class SignatureHelper.
 	/// </summary>
-	public class SignatureHelper {
+	public partial class SignatureHelper {
+
+		private FieldInfoSignature     _fieldInfoSignature;
+		private EventInfoSignature     _eventInfoSignature;
+		private MethodInfoSignature    _methodInfoSignature;
+		private ParameterInfoSignature _parameterInfoSignature;
+		private PropertyInfoSignature  _propertyInfoSignature;
+		private TypeSignature          _typeSignature;
 
 		/// <summary>
 		/// The signature mode
@@ -63,28 +71,66 @@ namespace KsWare.SignatureGenerator {
 		/// Initializes a new instance of the <see cref="SignatureHelper"/> class.
 		/// </summary>
 		/// <param name="signatureMode">The signature mode.</param>
-		private SignatureHelper(SignatureMode signatureMode) { _signatureMode = signatureMode; }
+		private SignatureHelper(SignatureMode signatureMode) {
+			_signatureMode = signatureMode;
+			_fieldInfoSignature=new FieldInfoSignature(this);
+			_eventInfoSignature=new EventInfoSignature(this);
+			_methodInfoSignature=new MethodInfoSignature(this);
+			_parameterInfoSignature=new ParameterInfoSignature(this);
+			_propertyInfoSignature=new PropertyInfoSignature(this);
+			_typeSignature=new TypeSignature(this);
+		}
+
+		public SignatureMode SignatureMode => _signatureMode;
+
+		/// <summary>
+		/// Creates signature for the specified event information.
+		/// </summary>
+		/// <param name="eventInfo">The event information.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(EventInfo eventInfo) => _eventInfoSignature.Sig(eventInfo);
 
 		/// <summary>
 		/// Creates signature for the specified method information.
 		/// </summary>
 		/// <param name="methodInfo">The method information.</param>
 		/// <returns>System.String.</returns>
-		public string Sig(MethodInfo methodInfo) {
-			var sb = new StringBuilder();
+		public string Sig(MethodInfo methodInfo) => _methodInfoSignature.Sig(methodInfo);
 
-			sb.Append(Sig(methodInfo.Attributes));
+		/// <summary>
+		/// Creates signature for the specified constructor information.
+		/// </summary>
+		/// <param name="constructorInfo">The constructor information.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(ConstructorInfo constructorInfo) => _methodInfoSignature.Sig(constructorInfo);
 
-			if (_signatureMode == SignatureMode.CompareIgnoreReturnType || _signatureMode==SignatureMode.InheriteDoc) { /*skip*/ }
-			else sb.Append(Sig(methodInfo.ReturnType) + " ");
-			sb.Append(methodInfo.Name);
-			sb.Append("(");
-			sb.Append(Sig(methodInfo.GetParameters()));
-			sb.Append(")");
+		/// <summary>
+		/// Creates signature for the specified parameter information.
+		/// </summary>
+		/// <param name="parameterInfo">The parameter information.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(ParameterInfo parameterInfo) => _parameterInfoSignature.Sig(parameterInfo);
 
-			if (sb.ToString() == "protected override void Finalize()") return $"~{methodInfo.DeclaringType.Name}()"; // Desctructor
-			return sb.ToString();
-		}
+		/// <summary>
+		/// Creates signature for the specified property information.
+		/// </summary>
+		/// <param name="propertyInfo">The property information.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(PropertyInfo propertyInfo) => _propertyInfoSignature.Sig(propertyInfo);
+
+		/// <summary>
+		/// Creates signature for the specified type.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(Type type) => _typeSignature.Sig(type);
+
+		/// <summary>
+		/// Creates signature for the specified field information.
+		/// </summary>
+		/// <param name="fieldInfo">The field information.</param>
+		/// <returns>System.String.</returns>
+		public string Sig(FieldInfo fieldInfo) => _fieldInfoSignature.Sig(fieldInfo);
 
 		/// <summary>
 		/// Creates signature for the specified attribute.
@@ -199,116 +245,7 @@ namespace KsWare.SignatureGenerator {
 			return sb.ToString();
 		}
 
-		/// <summary>
-		/// Creates signature for the specified constructor information.
-		/// </summary>
-		/// <param name="constructorInfo">The constructor information.</param>
-		/// <returns>System.String.</returns>
-		public string Sig(ConstructorInfo constructorInfo) {
-			var sb = new StringBuilder();
-
-			if(constructorInfo.IsStatic)
-				sb.Append("static ");
-			else 
-				sb.Append($"{Sig(constructorInfo.Attributes)}");
-			
-
-			sb.Append(constructorInfo.Name);
-			sb.Append("(");
-			sb.Append(Sig(constructorInfo.GetParameters()));
-			sb.Append(")");
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Creates signature for the specified event information.
-		/// </summary>
-		/// <param name="eventInfo">The event information.</param>
-		/// <returns>System.String.</returns>
-		public string Sig(EventInfo eventInfo) {
-			var sb = new StringBuilder();
-			var mi = eventInfo.AddMethod; // TODO
-
-			sb.Append($"{Sig(mi.Attributes)}");
-			sb.Append("event ");
-			sb.Append($"{eventInfo.EventHandlerType} ");
-			sb.Append($"{eventInfo.Name}");
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Creates signature for the specified field information.
-		/// </summary>
-		/// <param name="fieldInfo">The field information.</param>
-		/// <returns>System.String.</returns>
-		public string Sig(FieldInfo fieldInfo) {
-			var sb = new StringBuilder();
-
-			sb.Append($"{Sig(fieldInfo.Attributes)}");
-			sb.Append(Sig(fieldInfo.FieldType));
-			sb.Append(" ");
-			sb.Append(fieldInfo.Name);
-
-			return sb.ToString();
-//			return $"field {fieldInfo} // not implemented";
-		}
-
-		/// <summary>
-		/// Creates signature for the specified property information.
-		/// </summary>
-		/// <param name="propertyInfo">The property information.</param>
-		/// <returns>System.String.</returns>
-		public string Sig(PropertyInfo propertyInfo) {
-			var sb=new StringBuilder();
-			var getter = propertyInfo.GetMethod;
-			var setter = propertyInfo.SetMethod;
-
-			string access = "";
-			if (getter != null && setter != null) {
-				var getterAccess = SigAccess(getter.Attributes);
-				var setterAccess = SigAccess(setter.Attributes);
-				access = MaxAccess(getterAccess, setterAccess) + " ";
-			}
-			else if(getter!=null){
-				access = SigAccess(getter.Attributes);
-			}
-			else if (setter != null) {
-				access = SigAccess(setter.Attributes);
-			}
-
-			var mi = getter ?? setter;
-
-			sb.Append(access);
-			sb.Append(SigModifier(mi.Attributes));
-
-			sb.Append(Sig(propertyInfo.PropertyType));
-			sb.Append(" ");
-			if (propertyInfo.Name == "Item" && propertyInfo.GetMethod.GetParameters().Length>0) {
-				sb.Append("this[");
-				sb.Append(Sig(propertyInfo.GetMethod.GetParameters()));
-				sb.Append("]");
-			}
-			else {
-				sb.Append(propertyInfo.Name);
-			}
-			
-			sb.Append(" { ");
-
-			if (propertyInfo.CanRead) {
-				var getterAccess = SigAccess(getter.Attributes);
-				if (getterAccess != access) sb.Append(getterAccess);
-				sb.Append("get; ");
-			}
-			if (propertyInfo.CanWrite) {
-				var setterAccess = SigAccess(setter.Attributes);
-				if (setterAccess != access) sb.Append(setterAccess);
-				sb.Append("set; ");
-			}
-			sb.Append("}");
-
-			return sb.ToString();
-		}
+		
 
 		/// <summary>
 		/// Creates signature for the specified parameter infos.
@@ -320,123 +257,6 @@ namespace KsWare.SignatureGenerator {
 			var sb = new StringBuilder();
 			foreach (var pi in parameterInfos) sb.Append(", " + Sig(pi));
 			return sb.ToString(2, sb.Length                   - 2);
-		}
-
-		/// <summary>
-		/// Creates signature for the specified parameter information.
-		/// </summary>
-		/// <param name="parameterInfo">The parameter information.</param>
-		/// <returns>System.String.</returns>
-		public string Sig(ParameterInfo parameterInfo) {
-			var sb = new StringBuilder();
-			//Attributes?
-
-//			parameterInfo.IsIn;
-//			parameterInfo.IsOut;
-//			parameterInfo.IsRetval;
-//			parameterInfo.IsLcid;
-//			parameterInfo.HasDefaultValue;
-//TODO		parameterInfo.DefaultValue;
-//			parameterInfo.RawDefaultValue;
-//			parameterInfo.IsOptional;
-
-			switch (_signatureMode) {
-				case SignatureMode.Compare:
-				case SignatureMode.CompareIgnoreReturnType:
-				case SignatureMode.InheriteDoc:
-					var sig = Sig(parameterInfo.ParameterType);
-					if (parameterInfo.IsOut) sig = "out " + sig.Substring(4);
-					sb.Append(sig);
-					break;
-				case SignatureMode.Code:
-					sb.Append(Sig(parameterInfo.ParameterType));
-					sb.Append(" " + parameterInfo.Name);
-					break;
-			}
-			
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Creates signature for the specified type.
-		/// </summary>
-		/// <param name="type">The type.</param>
-		/// <returns>System.String.</returns>
-		public string Sig(Type type) {
-			var t = type; // store the unchanged type
-			var suffix = "";
-			var prefix = "";
-			start:
-			var fn = t.FullName; // possible null on generic types. "T", "T[]"
-			var n = t.Name;
-			if (n.EndsWith("]")) { // HasElementType==true
-
-				// []   [,]
-				// C#: string[][,] == Reflection Name = "String[,][]"
-				var match=Regex.Match(n, @"(\[,*\])$",RegexOptions.Compiled);
-				suffix = suffix + match.Value;
-				t = t.GetElementType();
-				goto start;
-			}
-			if (n.EndsWith("&")) { // HasElementType==true, IsByRef==true
-				// T& => ref T, out T
-				// the "out" is only known by ParameterInfo.IsOut
-				prefix +="ref ";
-				t = t.GetElementType();
-				goto start;
-			}
-
-			if (t.IsGenericParameter) {
-				// "T"
-				fn = n;
-			} 
-			else if (t.IsConstructedGenericType) {
-				// "KsWare.SignatureGenerator.Tests.SignatureHelperTests+IGenericInterface1`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-				var sb   = new StringBuilder();
-				var gt   = t.GetGenericTypeDefinition();
-				var gtfn = gt.FullName.Substring(0, gt.FullName.IndexOf("`"));
-				sb.Append(gtfn);
-				sb.Append("<");
-				sb.Append(Sig(t.GetGenericArguments()));
-				sb.Append(">");
-				fn = sb.ToString();
-			}
-			else if (t.IsGenericTypeDefinition) {
-				// "KsWare.SignatureGenerator.Tests.SignatureHelperTests+IGenericInterface1`1"
-				var sb   = new StringBuilder();
-				var gt   = t.GetGenericTypeDefinition();
-				var gtfn = gt.FullName.Substring(0, gt.FullName.IndexOf("`"));
-				sb.Append(gtfn);
-				sb.Append("<");
-				sb.Append(Sig(t.GetGenericArguments()));
-				sb.Append(">");
-				fn = sb.ToString();
-			}
-
-			if(fn==null) Debugger.Break();
-			if(fn.Contains("`")) Debugger.Break();
-
-			fn = fn.Replace("+", ".");
-
-			switch (fn) {
-				case "System.Void":    fn = "void";   break;
-				case "System.UInt16":  fn = "ushort"; break;
-				case "System.UInt32":  fn = "uint";	  break;
-				case "System.UInt64":  fn = "ulong";  break;
-				case "System.Int16":   fn = "short";  break;
-				case "System.Int32":   fn = "int";	  break;
-				case "System.Int64":   fn = "long";	  break;
-				case "System.Char":    fn = "char";	  break;
-				case "System.String":  fn = "string"; break;
-				case "System.Boolean": fn = "bool";	  break;
-				case "System.Byte":    fn = "byte";	  break;
-				case "System.SByte":   fn = "sbyte";  break;
-				case "System.Double":  fn = "double"; break;
-				case "System.Single":  fn = "float";  break;
-				case "System.Decimal": fn = "decimal";break;
-			}
-//			if (fn.StartsWith("System.")) return fn.Substring(7);
-			return prefix + fn + suffix;
 		}
 
 		/// <summary>
@@ -467,7 +287,6 @@ namespace KsWare.SignatureGenerator {
 				default: return $"unknown {memberInfo.MemberType}";
 			}
 		}
-
 
 		/// <summary>
 		/// Return the method signature as a string.
@@ -599,7 +418,7 @@ namespace KsWare.SignatureGenerator {
 		/// <param name="b">The 2nd access value.</param>
 		/// <returns>The access value with the heigher prio.</returns>
 		/// <remarks><para>The access values are one of <c>public</c>, <c>protected internal</c>, <c>protected</c>, <c>internal</c>, <c>protected private</c>, <c>private</c> </para></remarks>
-		private string MaxAccess(string a, string b) {
+		public string MaxAccess(string a, string b) {
 			var ai = Array.IndexOf(accessPrio,a.Trim());
 			var bi = Array.IndexOf(accessPrio, b.Trim());
 			return accessPrio[Math.Min(ai, bi)];

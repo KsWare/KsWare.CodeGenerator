@@ -59,6 +59,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignatureHelpers\EventInfoSignatureTests.cs" />
+    <Compile Include="SignatureHelpers\FieldInfoSignatureTests.cs" />
+    <Compile Include="SignatureHelpers\MethodInfoSignatureTests.cs" />
+    <Compile Include="SignatureHelpers\ParameterInfoSignatureTests.cs" />
+    <Compile Include="SignatureHelpers\PropertyInfoSignatureTests.cs" />
+    <Compile Include="SignatureHelpers\TypeSignatureTests.cs" />
     <Compile Include="SignatureHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>

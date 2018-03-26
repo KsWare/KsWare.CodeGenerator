@@ -44,6 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SignatureHelpers\BaseSignature.cs" />
+    <Compile Include="SignatureHelpers\~TemplateInfoSignature.cs" />
+    <Compile Include="SignatureHelpers\EventInfoSignature.cs" />
+    <Compile Include="SignatureHelpers\FieldInfoSignature.cs" />
+    <Compile Include="SignatureHelpers\MethodInfoSignature.cs" />
+    <Compile Include="SignatureHelpers\ParameterInfoSignature.cs" />
+    <Compile Include="SignatureHelpers\PropertyInfoSignature.cs" />
+    <Compile Include="SignatureHelpers\TypeSignature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignatureHelper.cs" />
     <Compile Include="SignatureMode.cs" />
