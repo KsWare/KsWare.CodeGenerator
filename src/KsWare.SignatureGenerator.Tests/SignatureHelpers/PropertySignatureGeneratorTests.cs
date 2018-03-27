@@ -6,12 +6,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 
 	[TestClass()]
-	public class PropertyInfoSignatureTests {
+	public class PropertySignatureGeneratorTests {
 
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
-		private class Properties {
+		private class PropertiesBase {
+			public virtual bool OC { get; set; }
+
+			public virtual bool SOC { get; set; }
+		}
+
+		private class Properties : PropertiesBase {
 
 			private bool A1 { get; set; }
 			protected bool B1 { get; set; }
@@ -37,6 +43,9 @@ namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 
 			public static bool SF { get; set; }
 
+			public override bool OC { get; set; }
+
+			public sealed override bool SOC { get; set; }
 		}
 		
 		[DataTestMethod]
@@ -54,6 +63,8 @@ namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 		[DataRow(typeof(Properties), "VA", "public virtual bool VA { get; private set; }")]
 		[DataRow(typeof(Properties), "VB", "public virtual bool VB { get; internal set; }")]
 		[DataRow(typeof(Properties), "VC", "public virtual bool VC { get; set; }")]
+		[DataRow(typeof(Properties), "OC", "public override bool OC { get; set; }")]
+		[DataRow(typeof(Properties), "SOC", "public sealed override bool SOC { get; set; }")]
 		public void SigPropertyInfoTest(Type type, string name, string result) {
 			var mi = type.GetProperty(name,BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | 
 				BindingFlags.DeclaredOnly);

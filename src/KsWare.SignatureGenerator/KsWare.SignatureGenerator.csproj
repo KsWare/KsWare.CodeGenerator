@@ -44,19 +44,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MethodSignatureOptions.cs" />
-    <Compile Include="SignatureHelpers\BaseSignature.cs" />
-    <Compile Include="SignatureHelpers\~TemplateInfoSignature.cs" />
-    <Compile Include="SignatureHelpers\EventInfoSignature.cs" />
-    <Compile Include="SignatureHelpers\FieldInfoSignature.cs" />
-    <Compile Include="SignatureHelpers\MethodInfoSignature.cs" />
-    <Compile Include="SignatureHelpers\ParameterInfoSignature.cs" />
-    <Compile Include="SignatureHelpers\PropertyInfoSignature.cs" />
-    <Compile Include="SignatureHelpers\TypeSignature.cs" />
+    <Compile Include="Generators\FieldSignatureOptions.cs" />
+    <Compile Include="Generators\GenericParameterSignatureOptions.cs" />
+    <Compile Include="Generators\MemberSignatureOptions.cs" />
+    <Compile Include="Generators\MethodSignatureOptions.cs" />
+    <Compile Include="Generators\ParameterSignatureOptions.cs" />
+    <Compile Include="Generators\PropertySignatureOptions.cs" />
+    <Compile Include="Generators\BaseSignatureGenerator.cs" />
+    <Compile Include="Generators\~TemplateInfoSignature.cs" />
+    <Compile Include="Generators\EventSignatureGenerator.cs" />
+    <Compile Include="Generators\FieldSignatureGenerator.cs" />
+    <Compile Include="Generators\MethodSignatureGenerator.cs" />
+    <Compile Include="Generators\ParameterSignatureGenerator.cs" />
+    <Compile Include="Generators\PropertySignatureGenerator.cs" />
+    <Compile Include="Generators\TypeSignatureGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignatureHelper.cs" />
     <Compile Include="SignatureMode.cs" />
-    <Compile Include="SignatureOptions.cs" />
+    <Compile Include="Generators\EventSignatureOptions.cs" />
+    <Compile Include="Generators\TypeSignatureOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

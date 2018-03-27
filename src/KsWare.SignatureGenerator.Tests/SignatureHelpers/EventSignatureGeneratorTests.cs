@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,7 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 
 	[TestClass()]
-	public class EventInfoSignatureTests {
+	public class EventSignatureGeneratorTests {
+
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 

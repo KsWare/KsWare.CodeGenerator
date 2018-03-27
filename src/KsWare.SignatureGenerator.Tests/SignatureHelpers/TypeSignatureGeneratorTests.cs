@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 
 	[TestClass()]
-	public class TypeSignatureTests {
+	public class TypeSignatureGeneratorTests {
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
@@ -64,18 +64,18 @@ namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 		}
 
 		[DataTestMethod] 
-		[DataRow(typeof(IGenericInterface1<>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureTests.IGenericInterface1<T>")]
-		[DataRow(typeof(IGenericInterface2<,>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureTests.IGenericInterface2<T1, T2>")]
-		[DataRow(typeof(GenericClass1<>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureTests.GenericClass1<T>")]
+		[DataRow(typeof(IGenericInterface1<>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureGeneratorTests.IGenericInterface1<T>")]
+		[DataRow(typeof(IGenericInterface2<,>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureGeneratorTests.IGenericInterface2<T1, T2>")]
+		[DataRow(typeof(GenericClass1<>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureGeneratorTests.GenericClass1<T>")]
 		public void GenericType_ForCompare_Test(Type type, string result) {
 			//TODO revise <> and <T> for compare because T is a name which can be changed without loose of compatibility
 			SignatureHelper.ForCompare.Sig(type).Should().Be(result);
 		}
 
 		[DataTestMethod]
-		[DataRow(typeof(IGenericInterface1<int>     ), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureTests.IGenericInterface1<int>")]
-		[DataRow(typeof(IGenericInterface2<int,bool>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureTests.IGenericInterface2<int, bool>")]
-		[DataRow(typeof(GenericClass1<int>          ), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureTests.GenericClass1<int>")]
+		[DataRow(typeof(IGenericInterface1<int>     ), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureGeneratorTests.IGenericInterface1<int>")]
+		[DataRow(typeof(IGenericInterface2<int,bool>), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureGeneratorTests.IGenericInterface2<int, bool>")]
+		[DataRow(typeof(GenericClass1<int>          ), "KsWare.SignatureGenerator.Tests.SignatureHelpers.TypeSignatureGeneratorTests.GenericClass1<int>")]
 		public void GenericTypeName2Test(Type type, string result) {
 			SignatureHelper.ForCompare.Sig(type).Should().Be(result);
 		}

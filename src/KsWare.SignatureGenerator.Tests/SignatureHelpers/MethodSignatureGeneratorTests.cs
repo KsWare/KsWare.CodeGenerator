@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 
 	[TestClass()]
-	public class MethodInfoSignatureTests {
+	public class MethodSignatureGeneratorTests {
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 

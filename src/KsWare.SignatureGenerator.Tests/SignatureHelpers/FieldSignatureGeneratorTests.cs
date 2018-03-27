@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace KsWare.SignatureGenerator.Tests.SignatureHelpers {
 
 	[TestClass()]
-	public class FieldInfoSignatureTests {
+	public class FieldSignatureGeneratorTests {
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
