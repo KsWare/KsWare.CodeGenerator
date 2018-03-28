@@ -65,10 +65,9 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(Properties), "VC", "public virtual bool VC { get; set; }")]
 		[DataRow(typeof(Properties), "OC", "public override bool OC { get; set; }")]
 		[DataRow(typeof(Properties), "SOC", "public sealed override bool SOC { get; set; }")]
-		public void SigPropertyInfoTest(Type type, string name, string result) {
-			var mi = type.GetProperty(name,BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | 
-				BindingFlags.DeclaredOnly);
-			Generator.ForCompare.Generate(mi).Should().Be(result);
+		public void GenerateProperty_Declare_Test(Type type, string name, string result) {
+			var mi = type.GetProperty(name,AllBindingFlags);
+			Generator.ForDeclare.Generate(mi).Should().Be(result);
 		}
 
 		private class Properties2 {
@@ -87,9 +86,7 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(Properties2), "B",   "public bool B { get; }")]
 		[DataRow(typeof(Properties2), "C",  "public bool C { set; }")]
 		public void SigfPropertyInfo2Test(Type type, string name, string result) {
-			var mi = (PropertyInfo) type.GetMember(name,
-				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
-				BindingFlags.DeclaredOnly)[0];
+			var mi = (PropertyInfo) type.GetMember(name,AllBindingFlags)[0];
 			Generator.ForCompare.Generate(mi).Should().Be(result);
 		}
 
@@ -111,27 +108,84 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(Properties3), "SRF", "public static ref System.ValueTuple SRRF { get; }")]
 		[DataRow(typeof(Properties3), "RRF", "public ref readonly System.ValueTuple RRF { get; }")]
 		[DataRow(typeof(Properties3), "SRRF", "public static ref readonly System.ValueTuple SRRF { get; }")]
-		public void SigRefPropertyInfoTest(Type type, string name, string result) {
-			var mi = (PropertyInfo) type.GetMember(name,
-				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
-				BindingFlags.DeclaredOnly)[0];
-			Generator.ForCompare.Generate(mi).Should().Be(result);
+		public void GenerateProperty_Declare_2_Test(Type type, string name, string result) {
+			var mi = (PropertyInfo) type.GetMember(name,AllBindingFlags)[0];
+			Generator.ForDeclare.Generate(mi).Should().Be(result);
 		}
 
 
-		#region MyRegion
+		#region Indexer
 
-		public class Indexer {
+		public class Indexer1 {
 			public string this[string a] { get { return null; } set { } }
 		}
 
+		public class Indexer2 {
+			public string this[string a, int b] { get { return null; } set { } }
+		}
+
+		public class Indexer3 {
+			public string this[string a, int b = 1] { get { return null; } set { } }
+		}
+
+		public class Indexer4 {
+			public string this[string a, params int[] b] { get { return null; } set { } }
+		}
+
 		[DataTestMethod]
-		[DataRow(typeof(Indexer), "Item", "public string this[string] { get; set; }")]
-		public void SigIndexerTest(Type type, string name, string result) {
+		[DataRow(typeof(Indexer1), "Item", "this[string] { get; set; }")]
+		[DataRow(typeof(Indexer2), "Item", "this[string, int] { get; set; }")]
+		[DataRow(typeof(Indexer3), "Item", "this[string, int] { get; set; }")]
+		[DataRow(typeof(Indexer4), "Item", "this[string, int[]] { get; set; }")]
+		public void GenerateProperty_ForSignature_Indexer_Test(Type type, string name, string result) {
+			// Debug.WriteLine(string.Join("\n",type.GetMembers(AllBindingFlags).Select(m=>m.Name)));
+			var mi = (PropertyInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForSignature.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Indexer1), "Item", "public string this[string] { get; set; }")]
+		[DataRow(typeof(Indexer2), "Item", "public string this[string, int] { get; set; }")]
+		[DataRow(typeof(Indexer3), "Item", "public string this[string, int] { get; set; }")]
+		[DataRow(typeof(Indexer4), "Item", "public string this[string, params int[]] { get; set; }")]
+		public void GenerateProperty_ForCompare_Indexer_Test(Type type, string name, string result) {
 			// Debug.WriteLine(string.Join("\n",type.GetMembers(AllBindingFlags).Select(m=>m.Name)));
 			var mi = (PropertyInfo) type.GetMember(name, AllBindingFlags)[0];
 			Generator.ForCompare.Generate(mi).Should().Be(result);
-		}		
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Indexer1), "Item", "public string this[string a] { get; set; }")]
+		[DataRow(typeof(Indexer2), "Item", "public string this[string a, int b] { get; set; }")]
+//TODO	[DataRow(typeof(Indexer3), "Item", "public string this[string a, int b = 1] { get; set; }")]
+		[DataRow(typeof(Indexer4), "Item", "public string this[string a, params int[] b] { get; set; }")]
+		public void GenerateProperty_ForDeclare_Indexer_Test(Type type, string name, string result) {
+			// Debug.WriteLine(string.Join("\n",type.GetMembers(AllBindingFlags).Select(m=>m.Name)));
+			var mi = (PropertyInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForDeclare.Generate(mi).Should().Be(result);
+		}
+
+//TODO	[DataTestMethod,Ignore]
+		[DataRow(typeof(Indexer1), "Item", "this[a]")]
+		[DataRow(typeof(Indexer2), "Item", "this[a, b]")]
+		[DataRow(typeof(Indexer3), "Item", "this[a, b]")]
+		[DataRow(typeof(Indexer4), "Item", "this[a, b]")]
+		public void GenerateProperty_ForCall_Indexer_Test(Type type, string name, string result) {
+			// Debug.WriteLine(string.Join("\n",type.GetMembers(AllBindingFlags).Select(m=>m.Name)));
+			var mi = (PropertyInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForCall.Generate(mi).Should().Be(result);
+		}
+		
+//TODO	[DataTestMethod, Ignore]
+		[DataRow(typeof(Indexer1), "Item", "this[string]")]
+		[DataRow(typeof(Indexer2), "Item", "this[string, int]")]
+		[DataRow(typeof(Indexer3), "Item", "this[string a, int]")]
+		[DataRow(typeof(Indexer4), "Item", "this[string a, int[]]")]
+		public void GenerateProperty_ForInheriteDoc_Indexer_Test(Type type, string name, string result) {
+			// Debug.WriteLine(string.Join("\n",type.GetMembers(AllBindingFlags).Select(m=>m.Name)));
+			var mi = (PropertyInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForInheriteDoc.Generate(mi).Should().Be(result);
+		}	
 
 		#endregion
 

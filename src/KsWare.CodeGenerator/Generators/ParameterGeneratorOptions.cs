@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Assembly         : KsWare.SignatureGenerator
+// Assembly         : KsWare.CodeGenerator
 // Author           : SchreinerK
 // Created          : 03-27-2018
 //

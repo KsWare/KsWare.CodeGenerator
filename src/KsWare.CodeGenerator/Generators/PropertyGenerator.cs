@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Assembly         : KsWare.SignatureGenerator
+// Assembly         : KsWare.CodeGenerator
 // Author           : SchreinerK
 // Created          : 03-26-2018
 //
@@ -63,22 +63,22 @@ namespace KsWare.CodeGenerator.Generators {
 
 			var mi = getter ?? setter;
 
-			sb.Append(access);
-			sb.Append(Generator.SigModifier(mi.Attributes));
+			if (options.Access   ) sb.Append(access);
+			if (options.Modifiers) sb.Append(Generator.SigModifier(mi.Attributes));
+			if (options.Type     ) sb.Append(Generator.Generate(propertyInfo.PropertyType)+" ");
 
-			sb.Append(Generator.Generate(propertyInfo.PropertyType));
-			sb.Append(" ");
+			
+			// Indexer
 			if (propertyInfo.Name == "Item" && propertyInfo.GetMethod.GetParameters().Length > 0) {
 				sb.Append("this[");
 				sb.Append(Generator.Generate(propertyInfo.GetMethod.GetParameters()));
 				sb.Append("]");
 			}
 			else {
-				sb.Append(propertyInfo.Name);
+				if (options.Name) sb.Append(propertyInfo.Name);
 			}
 
 			sb.Append(" { ");
-
 			if (propertyInfo.CanRead) {
 				var getterAccess = Generator.SigAccess(getter.Attributes);
 				if (getterAccess != access) sb.Append(getterAccess);

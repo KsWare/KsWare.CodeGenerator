@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Assembly         : KsWare.SignatureGenerator
+// Assembly         : KsWare.CodeGenerator
 // Author           : SchreinerK
 // Created          : 03-26-2018
 //
@@ -81,7 +81,7 @@ namespace KsWare.CodeGenerator.Generators {
 				fn = n;
 			} 
 			else if (t.IsConstructedGenericType) {
-				// "KsWare.SignatureGenerator.Tests.SignatureHelperTests+IGenericInterface1`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+				// "KsWare.CodeGenerator.Tests.SignatureHelperTests+IGenericInterface1`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
 				var sb   = new StringBuilder();
 				var gt   = t.GetGenericTypeDefinition();
 				var gtfn = gt.FullName.Substring(0, gt.FullName.IndexOf("`"));
@@ -92,7 +92,7 @@ namespace KsWare.CodeGenerator.Generators {
 				fn = sb.ToString();
 			}
 			else if (t.IsGenericTypeDefinition) {
-				// "KsWare.SignatureGenerator.Tests.SignatureHelperTests+IGenericInterface1`1"
+				// "KsWare.CodeGenerator.Tests.SignatureHelperTests+IGenericInterface1`1"
 				var sb   = new StringBuilder();
 				var gt   = t.GetGenericTypeDefinition();
 				var gtfn = gt.FullName.Substring(0, gt.FullName.IndexOf("`"));
