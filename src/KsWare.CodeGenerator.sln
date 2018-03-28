@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KsWare.CodeGenerator", "KsWare.CodeGenerator\KsWare.CodeGenerator.csproj", "{6E42C707-26AE-46AF-B8D9-B86ACBA59914}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KsWare.CodeGenerator.Tests", "KsWare.CodeGenerator.Tests\KsWare.CodeGenerator.Tests.csproj", "{4875EADA-5CC3-46D7-AE0A-8A1A710D15C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F87BF0F-6CCC-42E7-B50E-1BFE2A118272}"
+	ProjectSection(SolutionItems) = preProject
+		version.txt = version.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E42C707-26AE-46AF-B8D9-B86ACBA59914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E42C707-26AE-46AF-B8D9-B86ACBA59914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E42C707-26AE-46AF-B8D9-B86ACBA59914}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E42C707-26AE-46AF-B8D9-B86ACBA59914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4875EADA-5CC3-46D7-AE0A-8A1A710D15C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4875EADA-5CC3-46D7-AE0A-8A1A710D15C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4875EADA-5CC3-46D7-AE0A-8A1A710D15C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4875EADA-5CC3-46D7-AE0A-8A1A710D15C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F1F5F4BC-79F0-4806-AD2B-92DAECA59EF4}
+	EndGlobalSection
+EndGlobal
