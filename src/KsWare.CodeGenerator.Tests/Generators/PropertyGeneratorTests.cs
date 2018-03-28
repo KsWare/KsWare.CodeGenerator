@@ -65,11 +65,33 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(Properties), "VC", "public virtual bool VC { get; set; }")]
 		[DataRow(typeof(Properties), "OC", "public override bool OC { get; set; }")]
 		[DataRow(typeof(Properties), "SOC", "public sealed override bool SOC { get; set; }")]
-		public void GenerateProperty_Declare_Test(Type type, string name, string result) {
+		public void GenerateProperty_ForDeclare_Test(Type type, string name, string result) {
 			var mi = type.GetProperty(name,AllBindingFlags);
 			Generator.ForDeclare.Generate(mi).Should().Be(result);
 		}
 
+		[DataTestMethod]
+		[DataRow(typeof(Properties), "A1",  "private bool A1 { get; set; }")]
+		[DataRow(typeof(Properties), "B1",  "protected bool B1 { get; set; }")]
+		[DataRow(typeof(Properties), "C1",  "internal bool C1 { get; set; }")]
+		[DataRow(typeof(Properties), "D1",  "protected internal bool D1 { get; set; }")]
+		[DataRow(typeof(Properties), "F1",  "public bool F1 { get; set; }")]
+		[DataRow(typeof(Properties), "D2",  "protected internal bool D2 { get; protected set; }")]
+		[DataRow(typeof(Properties), "F2",  "public bool F2 { get; protected set; }")]
+		[DataRow(typeof(Properties), "D3",  "protected internal bool D3 { get; internal set; }")]
+		[DataRow(typeof(Properties), "F3",  "public bool F3 { get; internal set; }")]
+		[DataRow(typeof(Properties), "F4",  "public bool F4 { get; protected internal set; }")]
+		[DataRow(typeof(Properties), "C3",  "internal bool C3 { get; private set; }")]
+		[DataRow(typeof(Properties), "VA",  "public virtual bool VA { get; private set; }")]
+		[DataRow(typeof(Properties), "VB",  "public virtual bool VB { get; internal set; }")]
+		[DataRow(typeof(Properties), "VC",  "public virtual bool VC { get; set; }")]
+		[DataRow(typeof(Properties), "OC",  "public override bool OC { get; set; }")]
+		[DataRow(typeof(Properties), "SOC", "public sealed override bool SOC { get; set; }")]
+		public void GenerateProperty_ForCompare_Test(Type type, string name, string result) {
+			var mi = type.GetProperty(name, AllBindingFlags);
+			Generator.ForCompare.Generate(mi).Should().Be(result);
+		}
+		
 		private class Properties2 {
 
 			//TODO A has same signature as B
@@ -103,7 +125,7 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		}
 
 		[DataTestMethod, Ignore]
-		[DataRow(typeof(Properties3), "RF0",  "public System.ValueTuple RF0 { get; }")]
+		[DataRow(typeof(Properties3), "RF0", "public System.ValueTuple RF0 { get; }")]
 		[DataRow(typeof(Properties3), "RF",  "public ref System.ValueTuple RF { get; }")]
 		[DataRow(typeof(Properties3), "SRF", "public static ref System.ValueTuple SRRF { get; }")]
 		[DataRow(typeof(Properties3), "RRF", "public ref readonly System.ValueTuple RRF { get; }")]
