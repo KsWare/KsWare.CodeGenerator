@@ -1,2 +1,2 @@
 
-[Edit this file](https://github.com/KsWare/KsWare.SignatureGenerator/edit/gh-pages/index.md)
+[Edit this file](https://github.com/KsWare/KsWare.CodeGenerator/edit/gh-pages/index.md)
