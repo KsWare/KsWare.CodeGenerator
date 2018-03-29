@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\MethodInfoExtensions.cs" />
     <Compile Include="Generators\FieldGeneratorOptions.cs" />
     <Compile Include="Generators\GenericParameterGeneratorOptions.cs" />
     <Compile Include="Generators\MemberGeneratorOptions.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="GeneratorMode.cs" />
     <Compile Include="Generators\EventGeneratorOptions.cs" />
     <Compile Include="Generators\TypeNameGeneratorOptions.cs" />
+    <Compile Include="WrapperGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

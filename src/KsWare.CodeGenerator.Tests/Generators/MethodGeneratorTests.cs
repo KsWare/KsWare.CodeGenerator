@@ -207,6 +207,56 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
 			Generator.ForCompare.Generate(mi).Should().Be(result);
 		}
+
+		class Op { //TODO overload operator
+			// https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/overloadable-operators
+			// https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/operator-overloads
+
+			// 	public static op_Equality(System.Reflection.MethodInfo left, System.Reflection.MethodInfo right)  => System.Reflection.MethodInfo.op_Equality(left, right);
+			// op_Inequality
+
+			// +, -, !, ~, ++, --, true, false	These unary operators can be overloaded.
+
+			public static Op operator +(Op a) { return default; }
+			public static Op operator -(Op a) { return default; }
+			public static Op operator !(Op a) { return default; }
+			public static Op operator ++(Op a) { return default; }
+			public static Op operator --(Op a) { return default; }
+			public static bool operator true(Op a) { return default; }
+			public static bool operator false(Op a) { return default; }
+			
+			// ==, !=, <, >, <=, >=	The comparison operators can be overloaded (but see the note that follows this table).
+
+			public static bool operator ==(Op a, Op b) { return default; }
+			public static bool operator !=(Op a, Op b) { return default; }
+			public static bool operator <(Op a, Op b) { return default; }
+			public static bool operator >(Op a, Op b) { return default; }
+			public static bool operator <=(Op a, Op b) { return default; }
+			public static bool operator >=(Op a, Op b) { return default; }
+
+			// +, -, *, /, %, &, |, ^, <<, >>	These binary operators can be overloaded.
+
+			public static Op operator +(Op a, Op b) { return default; }
+			public static Op operator -(Op a, Op b) { return default; }
+			public static Op operator *(Op a, Op b) { return default; }
+			public static Op operator /(Op a, Op b) { return default; }
+			public static Op operator %(Op a, Op b) { return default; }
+			public static Op operator &(Op a, Op b) { return default; }
+			public static Op operator |(Op a, Op b) { return default; }
+			public static Op operator ^(Op a, Op b) { return default; }
+			public static Op operator <<(Op a, int b) { return default; }
+			public static Op operator >>(Op a, int b) { return default; }
+
+
+			public static implicit operator int(Op f) { return default; }
+			public static explicit operator double(Op f) { return default; }
+
+		}
 	}
 
+	internal class Extended { }
+
+	internal static class Extensions { //TODO extension methods
+		public static void A(this Extended extended) { }
+	}
 }

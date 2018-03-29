@@ -11,6 +11,8 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
@@ -80,6 +82,91 @@ namespace KsWare.CodeGenerator.Generators {
 			return sb.ToString();
 		}
 
-		
+		private static readonly Dictionary<string, string> OperatorNames = new Dictionary<string, string>() {
+			{"op_Implicit", "N/A"},
+			{"op_Explicit", "N/A"},
+			{"op_Addition", "+"},
+			{"op_Subtraction", "-"},
+			{"op_Multiply", "*"},
+			{"op_Division", "/"},
+			{"op_Modulus", "%"},
+			{"op_ExclusiveOr", "^"},
+			{"op_BitwiseAnd", "&"},
+			{"op_BitwiseOr", "|"},
+			{"op_LogicalAnd", "&&"},
+			{"op_LogicalOr", "||"},
+			{"op_Assign", "="},
+			{"op_LeftShift", "<<"},
+			{"op_RightShift", ">>"},
+			{"op_SignedRightShift", "N/A"},
+			{"op_UnsignedRightShift", "N/A"},
+			{"op_Equality", "=="},
+			{"op_Inequality", "!="},
+			{"op_GreaterThan", ">"},
+			{"op_LessThan", "<"},
+			{"op_GreaterThanOrEqual", ">="},
+			{"op_LessThanOrEqual", "<="},
+			{"op_MultiplicationAssignment", "*="},
+			{"op_SubtractionAssignment", "-="},
+			{"op_ExclusiveOrAssignment", "^="},
+			{"op_LeftShiftAssignment", "<<="},
+			{"op_ModulusAssignment", "%="},
+			{"op_AdditionAssignment", "+="},
+			{"op_BitwiseAndAssignment", "&="},
+			{"op_BitwiseOrAssignment", "|="},
+			{"op_Comma", ","},
+			{"op_DivisionAssignment", "/="},
+			{"op_Decrement", "--"},
+			{"op_Increment", "++"},
+			{"op_UnaryNegation", "-"},
+			{"op_UnaryPlus", "+"},
+			{"op_OnesComplement", "~"},
+		};
+
+		internal string Operator(string name) {
+			return OperatorNames[name];
+
+			/*
+			C# Operator Symbol	Metadata Name		Friendly Name
+			N/A			op_Implicit					To<TypeName>/From<TypeName>
+			N/A			op_Explicit					To<TypeName>/From<TypeName>
+			+			op_Addition					Add (binary)
+			-			op_Subtraction				Subtract (binary)
+			*			op_Multiply					Multiply (binary)
+			/			op_Division					Divide
+			%			op_Modulus					Mod or Remainder
+			^			op_ExclusiveOr				Xor
+			&			op_BitwiseAnd				BitwiseAnd (binary)
+			|			op_BitwiseOr				BitwiseOr
+			&&			op_LogicalAnd				And
+			||			op_LogicalOr				Or
+			=			op_Assign					Assign
+			<<			op_LeftShift				LeftShift
+			>>			op_RightShift				RightShift
+			N/A			op_SignedRightShift			SignedRightShift
+			N/A			op_UnsignedRightShift		UnsignedRightShift
+			==			op_Equality					Equals
+			!=			op_Inequality				Equals
+			>			op_GreaterThan				CompareTo
+			<			op_LessThan					CompareTo
+			>=			op_GreaterThanOrEqual		CompareTo
+			<=			op_LessThanOrEqual			CompareTo
+			*=			op_MultiplicationAssignment	Multiply
+			-=			op_SubtractionAssignment	Subtract
+			^=			op_ExclusiveOrAssignment	Xor
+			<<=			op_LeftShiftAssignment		LeftShift
+			%=			op_ModulusAssignment		Mod
+			+=			op_AdditionAssignment		Add
+			&=			op_BitwiseAndAssignment		BitwiseAnd
+			|=			op_BitwiseOrAssignment		BitwiseOr
+			,			op_Comma					Comma
+			/=			op_DivisionAssignment		Divide
+			--			op_Decrement				Decrement
+			++			op_Increment				Increment
+			- (unary)	op_UnaryNegation			Negate
+			+ (unary)	op_UnaryPlus				Plus
+			~			op_OnesComplement			OnesComplement
+			*/
+		}
 	}
 }

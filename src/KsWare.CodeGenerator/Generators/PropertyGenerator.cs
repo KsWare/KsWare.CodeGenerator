@@ -78,19 +78,23 @@ namespace KsWare.CodeGenerator.Generators {
 				if (options.Name) sb.Append(propertyInfo.Name);
 			}
 
-			sb.Append(" { ");
-			if (propertyInfo.CanRead) {
-				var getterAccess = Generator.SigAccess(getter.Attributes);
-				if (getterAccess != access) sb.Append(getterAccess);
-				sb.Append("get; ");
+			if (GeneratorMode == GeneratorMode.InheriteDoc) {
+				// not body
 			}
-			if (propertyInfo.CanWrite) {
-				var setterAccess = Generator.SigAccess(setter.Attributes);
-				if (setterAccess != access) sb.Append(setterAccess);
-				sb.Append("set; ");
+			else {
+				sb.Append(" { ");
+				if (propertyInfo.CanRead) {
+					var getterAccess = Generator.SigAccess(getter.Attributes);
+					if (getterAccess != access) sb.Append(getterAccess);
+					sb.Append("get; ");
+				}
+				if (propertyInfo.CanWrite) {
+					var setterAccess = Generator.SigAccess(setter.Attributes);
+					if (setterAccess != access) sb.Append(setterAccess);
+					sb.Append("set; ");
+				}
+				sb.Append("}");				
 			}
-			sb.Append("}");
-
 			return sb.ToString();
 		}
 	}
