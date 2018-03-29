@@ -12,11 +12,13 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
+#pragma warning disable 67
 		private class Events {
 			public event System.EventHandler A;                       //                 | HideBySig | SpecialName
 			public event System.EventHandler B { add { } remove { } } //                 | HideBySig | SpecialName
 			public static event System.EventHandler SA;               //          Static | HideBySig | SpecialName
 		}
+#pragma warning restore 67
 
 		[DataTestMethod]
 		[DataRow(typeof(Events), "A",  "public event System.EventHandler A")]

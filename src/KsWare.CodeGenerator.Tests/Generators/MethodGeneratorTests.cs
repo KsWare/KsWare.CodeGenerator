@@ -208,7 +208,9 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 			Generator.ForCompare.Generate(mi).Should().Be(result);
 		}
 
+#pragma warning disable 660,661
 		class Op { //TODO overload operator
+
 			// https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/overloadable-operators
 			// https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/operator-overloads
 
@@ -252,6 +254,7 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 			public static explicit operator double(Op f) { return default; }
 
 		}
+#pragma warning restore 660,661
 	}
 
 	internal class Extended { }

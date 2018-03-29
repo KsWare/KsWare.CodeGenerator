@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,18 +7,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace KsWare.CodeGenerator.Tests.Generators {
 
 	[TestClass()]
+	
 	public class FieldGeneratorTests {
 		private const BindingFlags AllBindingFlags = BindingFlags.Instance  | BindingFlags.Static | BindingFlags.Public |
 		                                             BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
+#pragma warning disable 169, 649
+		[SuppressMessage("ReSharper", "InconsistentNaming")]
 		private class Fields {
 			public bool A;
 			public static bool SA;
 			public const bool CA = true;
 			public readonly bool RA = true;
 			public static readonly bool SRA = true;
-
 		}
+#pragma warning restore 169, 649
 
 		[DataTestMethod]
 		[DataRow(typeof(Fields), "A",   "public bool A")]
