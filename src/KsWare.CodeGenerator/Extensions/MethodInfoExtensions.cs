@@ -32,7 +32,17 @@ namespace KsWare.CodeGenerator.Extensions {
 		/// <param name="m">The method.</param>
 		/// <returns><c>true</c> if is operator overload; otherwise, <c>false</c>.</returns>
 		public static bool IsOperatorOverload(this MethodInfo m) {
-			return m.IsSpecialName && m.IsStatic && m.Name.StartsWith("op_"); //TODO revise. Not 100% safe.
+			return m.IsSpecialName && m.IsStatic && m.Name.StartsWith("op_"); 
+		}
+
+		/// <summary>
+		/// Determines whether the specified method is overloaded operator.
+		/// </summary>
+		/// <param name="m">The method.</param>
+		/// <returns><c>true</c> if is operator overload; otherwise, <c>false</c>.</returns>
+		public static bool IsAccessor(this MethodInfo m) {
+			return m.IsSpecialName && m.IsStatic && (m.Name.StartsWith("get_") || m.Name.StartsWith("set_") ||
+			                                         m.Name.StartsWith("add_") || m.Name.StartsWith("remove_"));
 		}
 	}
 }
