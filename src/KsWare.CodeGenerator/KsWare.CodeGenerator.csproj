@@ -33,6 +33,12 @@
     <LangVersion>7.2</LangVersion>
     <DocumentationFile>bin\Release\KsWare.CodeGenerator.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Properties\key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -64,6 +70,9 @@
     <Compile Include="Generators\EventGeneratorOptions.cs" />
     <Compile Include="Generators\TypeNameGeneratorOptions.cs" />
     <Compile Include="WrapperGenerator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\key.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

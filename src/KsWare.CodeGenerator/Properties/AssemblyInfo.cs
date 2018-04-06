@@ -20,3 +20,13 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.2.13")]
 [assembly: AssemblyFileVersion("0.2.13")]
 [assembly: AssemblyInformationalVersion("0.2.13")]
+
+// ReSharper disable once CheckNamespace
+namespace KsWare.CodeGenerator {
+
+	public static class AssemblyInfo {
+		public static Assembly Assembly => Assembly.GetExecutingAssembly();
+	}
+
+
+}
