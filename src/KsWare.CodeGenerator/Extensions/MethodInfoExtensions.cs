@@ -36,13 +36,13 @@ namespace KsWare.CodeGenerator.Extensions {
 		}
 
 		/// <summary>
-		/// Determines whether the specified method is overloaded operator.
+		/// Determines whether the specified method is accessor for property or events.
 		/// </summary>
-		/// <param name="m">The method.</param>
-		/// <returns><c>true</c> if is operator overload; otherwise, <c>false</c>.</returns>
+		/// <param name="m">The method inforamtion</param>
+		/// <returns><c>true</c> if is accessor; otherwise, <c>false</c>.</returns>
 		public static bool IsAccessor(this MethodInfo m) {
 			return m.IsSpecialName && (m.Name.StartsWith("get_") || m.Name.StartsWith("set_") ||
-			                                         m.Name.StartsWith("add_") || m.Name.StartsWith("remove_"));
+			                           m.Name.StartsWith("add_") || m.Name.StartsWith("remove_"));
 		}
 	}
 }

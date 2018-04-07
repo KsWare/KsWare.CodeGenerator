@@ -50,21 +50,21 @@ namespace KsWare.CodeGenerator.Generators {
 
 			string access = "";
 			if (getter != null && setter != null) {
-				var getterAccess = Generator.SigAccess(getter.Attributes);
-				var setterAccess = Generator.SigAccess(setter.Attributes);
+				var getterAccess = Generator.Access(getter.Attributes);
+				var setterAccess = Generator.Access(setter.Attributes);
 				access = Generator.MaxAccess(getterAccess, setterAccess) + " ";
 			}
 			else if (getter != null) {
-				access = Generator.SigAccess(getter.Attributes);
+				access = Generator.Access(getter.Attributes);
 			}
 			else if (setter != null) {
-				access = Generator.SigAccess(setter.Attributes);
+				access = Generator.Access(setter.Attributes);
 			}
 
 			var mi = getter ?? setter;
 
 			if (options.Access   ) sb.Append(access);
-			if (options.Modifiers) sb.Append(Generator.SigModifier(mi.Attributes));
+			if (options.Modifiers) sb.Append(Generator.Modifier(mi.Attributes));
 			if (options.Type     ) sb.Append(Generator.Generate(propertyInfo.PropertyType)+" ");
 
 			
@@ -84,12 +84,12 @@ namespace KsWare.CodeGenerator.Generators {
 			else {
 				sb.Append(" { ");
 				if (propertyInfo.CanRead) {
-					var getterAccess = Generator.SigAccess(getter.Attributes);
+					var getterAccess = Generator.Access(getter.Attributes);
 					if (getterAccess != access) sb.Append(getterAccess);
 					sb.Append("get; ");
 				}
 				if (propertyInfo.CanWrite) {
-					var setterAccess = Generator.SigAccess(setter.Attributes);
+					var setterAccess = Generator.Access(setter.Attributes);
 					if (setterAccess != access) sb.Append(setterAccess);
 					sb.Append("set; ");
 				}

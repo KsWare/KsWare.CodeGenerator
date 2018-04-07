@@ -48,8 +48,8 @@ namespace KsWare.CodeGenerator.Generators {
 		public string Generate(MethodInfo methodInfo, MethodGeneratorOptions options) {
 			var sb = new StringBuilder();
 
-			if (options.Access    ) sb.Append(Generator.SigAccess  (methodInfo.Attributes));
-			if (options.Modifiers ) sb.Append(Generator.SigModifier(methodInfo.Attributes));
+			if (options.Access    ) sb.Append(Generator.Access  (methodInfo.Attributes));
+			if (options.Modifiers ) sb.Append(Generator.Modifier(methodInfo.Attributes));
 			if (options.ReturnType) sb.Append(Generator.Generate        (methodInfo.ReturnType) + " ");
 			if (options.Name      ) sb.Append(methodInfo.Name);
 

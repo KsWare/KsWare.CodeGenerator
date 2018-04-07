@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace KsWare.CodeGenerator.Generators {
@@ -64,21 +65,29 @@ namespace KsWare.CodeGenerator.Generators {
 //			parameterInfo.RawDefaultValue;
 //			parameterInfo.IsOptional;
 
-//			var isParams = parameterInfo.GetCustomAttributes(typeof(ParamArrayAttribute)).Any(); // Not for reflection only
+
+			var isThis = parameterInfo.Position == 0 &&
+			             parameterInfo.Member.CustomAttributes.Any(a => a.AttributeType == typeof(ExtensionAttribute));
 			var isParams = parameterInfo.CustomAttributes.Any(a => a.AttributeType == typeof(ParamArrayAttribute));
 
 			var type = Generator.Generate(parameterInfo.ParameterType) + " ";
-			var modifier = type.StartsWith("ref ") ? "ref " : "";
-			if (parameterInfo.IsOut) modifier = "out ";
-			if (type.StartsWith("ref ")) type = type.Substring(4);
-			if (isParams) modifier = "params ";
 
-			// "params" is not relevant for signature 
-			if (isParams && GeneratorMode == GeneratorMode.Signature) modifier = "";
+			var modifier = "";
+
+			if (type.StartsWith("ref ")) { // (parameterInfo.ParameterType.IsByRef)
+				modifier = "ref ";
+				type = type.Substring(4);
+			}
+			if (isThis) modifier = "this ";
+			else if (parameterInfo.IsOut) modifier = "out ";
+			else if (isParams) modifier = "params ";
+
+			// "params" and "this" are not relevant for signature 
+			if (GeneratorMode == GeneratorMode.Signature && (isParams || isThis)) modifier = "";
 
 			if (options.Modifiers) sb.Append(modifier);
-			if (options.Type) sb.Append(type);
-			if (options.Name) sb.Append(parameterInfo.Name);
+			if (options.Type     ) sb.Append(type);
+			if (options.Name     ) sb.Append(parameterInfo.Name);
 			//TODO default value
 
 			return sb.ToString().Trim();

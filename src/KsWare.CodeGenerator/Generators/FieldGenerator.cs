@@ -47,8 +47,8 @@ namespace KsWare.CodeGenerator.Generators {
 		public string Generate(FieldInfo fieldInfo, FieldGeneratorOptions options) {
 			var sb = new StringBuilder();
 
-			if (options.Access   ) sb.Append(Generator.SigAccess((MethodAttributes) fieldInfo.Attributes));
-			if (options.Modifiers) sb.Append(Generator.SigModifier(fieldInfo.Attributes));
+			if (options.Access   ) sb.Append(Generator.Access((MethodAttributes) fieldInfo.Attributes));
+			if (options.Modifiers) sb.Append(Generator.Modifier(fieldInfo.Attributes));
 			if (options.Type     ) sb.Append(Generator.Generate(fieldInfo.FieldType)+ " ");
 			if (options.Name     ) sb.Append(fieldInfo.Name);
 			//TODO Value;

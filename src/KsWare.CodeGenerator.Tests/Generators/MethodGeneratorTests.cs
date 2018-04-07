@@ -89,18 +89,8 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(MethodModifiersC), "VE", "protected internal sealed override bool VE()")]
 		[DataRow(typeof(MethodModifiersC), "VF", "public sealed override bool VF()")]
 		[DataRow(typeof(MethodModifiers), "EX", "private static extern uint EX()")]
-		public void SigMethodInfoTest(Type type, string name, string result) {
+		public void Method_ForCompare_Test(Type type, string name, string result) {
 			var mi=(MethodInfo)type.GetMember(name,BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly)[0];
-			Generator.ForCompare.Generate(mi).Should().Be(result);
-		}
-
-		[DataTestMethod]
-		[DataRow(typeof(MethodModifiers), "SA", "private static bool SA()")] // Private | Static | HideBySig
-		[DataRow(typeof(MethodModifiers), "EX", "private static extern uint EX()")]
-		public void SigMethodInfo2Test(Type type, string name, string result) {
-			var mi = (MethodInfo) type.GetMember(name,
-				BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
-				BindingFlags.DeclaredOnly)[0];
 			Generator.ForCompare.Generate(mi).Should().Be(result);
 		}
 		#endregion
@@ -195,15 +185,7 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(GenericClass1<>), "PM11", "public void PM11(ref T[])")]
 		[DataRow(typeof(GenericClass1<>), "PM12", "public void PM12(out T)")]
 		[DataRow(typeof(GenericClass1<>), "PM13", "public void PM13(out T[])")]
-		public void SigGenericMethodTest(Type type, string name, string result) {
-			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
-			Generator.ForCompare.Generate(mi).Should().Be(result);
-		}
-
-		[DataTestMethod]
-		[DataRow(typeof(GenericClass1<>), "PM10", "public void PM10(ref T)")]
-		[DataRow(typeof(GenericClass1<>), "PM12", "public void PM12(out T)")]
-		public void SigGenericMethod1Test(Type type, string name, string result) {
+		public void GenericMethod_ForCompare_Test(Type type, string name, string result) {
 			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
 			Generator.ForCompare.Generate(mi).Should().Be(result);
 		}
@@ -255,11 +237,48 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 
 		}
 #pragma warning restore 660,661
+
+		[DataTestMethod]
+		[DataRow(typeof(Extensions), "A", "public static void A(this KsWare.CodeGenerator.Tests.Generators.ExtendedClass extended)")]
+		public void Extension_ForDeclare_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForDeclare.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Extensions), "A", "A(extended)")]
+		public void Extension_ForCall_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForCall.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Extensions), "A", "A(KsWare.CodeGenerator.Tests.Generators.ExtendedClass)")]
+		public void Extension_ForSignature_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForSignature.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Extensions), "A", "A(KsWare.CodeGenerator.Tests.Generators.ExtendedClass)")]
+		public void Extension_ForInheriteDoc_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForInheriteDoc.Generate(mi).Should().Be(result);
+		}
+
+		//TODO GenericMethod<T>
+
 	}
 
-	internal class Extended { }
+	internal class ExtendedClass { }
+
+	internal class ExtendedClass<T> { }
 
 	internal static class Extensions { //TODO extension methods
-		public static void A(this Extended extended) { }
+		public static void A(this ExtendedClass extended) { }
+
+//TODO	public static void A<T>(this ExtendedClass extended) { }
+
+//TODO	public static void B<T>(this ExtendedClass<T> extended) { }
 	}
 }
