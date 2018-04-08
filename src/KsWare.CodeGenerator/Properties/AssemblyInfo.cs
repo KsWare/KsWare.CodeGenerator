@@ -17,9 +17,9 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: Guid("6e42c707-26ae-46af-b8d9-b86acba59914")]
 
-[assembly: AssemblyVersion("0.2.15")]
-[assembly: AssemblyFileVersion("0.2.15")]
-[assembly: AssemblyInformationalVersion("0.2.15")]
+[assembly: AssemblyVersion("0.2.16")]
+[assembly: AssemblyFileVersion("0.2.16")]
+[assembly: AssemblyInformationalVersion("0.2.16")]
 
 // ReSharper disable once CheckNamespace
 namespace KsWare.CodeGenerator {
