@@ -41,8 +41,8 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		public sealed class PublicSealedClass { }
 
 		public interface IGenericInterface1<T> { }
-
 		public interface IGenericInterface2<T1, T2> { }
+//TODO	public new partial interface IGenericInterface3<out T1, in T2, T3> {}
 
 		public class GenericClass1<T> {}
 
@@ -79,6 +79,8 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		public void GenericTypeName2Test(Type type, string result) {
 			Generator.ForCompare.Generate(type).Should().Be(result);
 		}
+
+
 	}
 
 	internal interface IInternalInterface { }

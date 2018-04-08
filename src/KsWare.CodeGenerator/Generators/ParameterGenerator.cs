@@ -53,6 +53,8 @@ namespace KsWare.CodeGenerator.Generators {
 		/// <param name="options">The generator options.</param>
 		/// <returns>System.String.</returns>
 		public string Generate(ParameterInfo parameterInfo, ParameterGeneratorOptions options) {
+			// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#method-parameters
+
 			var sb = new StringBuilder();
 			//Attributes?
 
@@ -82,12 +84,16 @@ namespace KsWare.CodeGenerator.Generators {
 			else if (parameterInfo.IsOut) modifier = "out ";
 			else if (isParams) modifier = "params ";
 
-			// "params" and "this" are not relevant for signature 
-			if (GeneratorMode == GeneratorMode.Signature && (isParams || isThis)) modifier = "";
+			// "params" and "this" are relevant only for declare and compare
+			switch (GeneratorMode) {
+				case GeneratorMode.Compare:case GeneratorMode.CompareIgnoreReturnType:case GeneratorMode.Declare: break;
+				default: if(isParams || isThis) modifier = ""; break;
+			}
 
 			if (options.Modifiers) sb.Append(modifier);
 			if (options.Type     ) sb.Append(type);
 			if (options.Name     ) sb.Append(parameterInfo.Name);
+
 			//TODO default value
 
 			return sb.ToString().Trim();

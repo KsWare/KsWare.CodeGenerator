@@ -13,10 +13,11 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		private class Parameters {
 
 			public void A() { }
-			public void B(bool a) { }			// same signature as B(bool a = false)
+			public void B(bool a) { }			// same signature as H(bool a = false)
 			public void C(bool[] a) { }
 			public void D(params bool[] a) { } // same signature as C
 			public void E(ref bool a) { }
+			public void E(bool a) { }
 			public void F(out bool a) { a = false; }
 
 			// TODO
@@ -47,17 +48,51 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		[DataRow(typeof(Parameters), "F", "out bool a")]
 		[DataRow(typeof(Parameters), "G", "int a, bool b")]
 		[DataRow(typeof(Parameters), "H", "bool a")] //TODO optional
-		public void SigParameters_Code_Test(Type type, string name, string result) {
+		public void Parameters_ForDeclare_Test(Type type, string name, string result) {
 			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
-			Generator.ForCode.Generate(mi.GetParameters()).Should().Be(result);
+			Generator.ForDeclare.Generate(mi.GetParameters()).Should().Be(result);
 		}
 
 		[DataTestMethod]
+		[DataRow(typeof(Parameters), "A", "")]
+		[DataRow(typeof(Parameters), "B", "a")]
+		[DataRow(typeof(Parameters), "C", "a")]
+		[DataRow(typeof(Parameters), "D", "a")]
+		[DataRow(typeof(Parameters), "E", "ref a")]
+		[DataRow(typeof(Parameters), "F", "out a")]
+		[DataRow(typeof(Parameters), "G", "a, b")]
+		[DataRow(typeof(Parameters), "H", "a")] //TODO optional
+		public void Parameters_ForCall_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForCall.Generate(mi.GetParameters()).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Parameters), "A", "")]
+		[DataRow(typeof(Parameters), "B", "bool")]
 		[DataRow(typeof(Parameters), "C", "bool[]")]
-		[DataRow(typeof(Parameters), "D", "params bool[]")] 
-		public void SigParameters1Test(Type type, string name, string result) {
-			var mi = (MethodInfo) type.GetMember(name,AllBindingFlags)[0];
-			Generator.ForCompare.Generate(mi.GetParameters()).Should().Be(result);
+		[DataRow(typeof(Parameters), "D", "bool[]")]
+		[DataRow(typeof(Parameters), "E", "ref bool")]
+		[DataRow(typeof(Parameters), "F", "out bool")]
+		[DataRow(typeof(Parameters), "G", "int, bool")]
+		[DataRow(typeof(Parameters), "H", "bool")] 
+		public void Parameters_ForInheriteDoc_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForInheriteDoc.Generate(mi.GetParameters()).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(Parameters), "A", "")]
+		[DataRow(typeof(Parameters), "B", "bool")]
+		[DataRow(typeof(Parameters), "C", "bool[]")]
+		[DataRow(typeof(Parameters), "D", "bool[]")]
+		[DataRow(typeof(Parameters), "E", "ref bool")]
+		[DataRow(typeof(Parameters), "F", "out bool")]
+		[DataRow(typeof(Parameters), "G", "int, bool")]
+		[DataRow(typeof(Parameters), "H", "bool")]
+		public void Parameters_ForSignature_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForSignature.Generate(mi.GetParameters()).Should().Be(result);
 		}
 	}
 

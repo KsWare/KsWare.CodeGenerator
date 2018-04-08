@@ -28,12 +28,12 @@ namespace KsWare.CodeGenerator.Generators {
 			/*                                             Modifiers                     */
 			/*                                             |  Type                       */
 			/*                                             |  |  Name                    */
-			{GeneratorMode.Code                   , new[] {X, X, X}},
+			{GeneratorMode.Code                   , new[] {X, X, X}}, // Obsolete
 			{GeneratorMode.Compare                , new[] {X, X, ˑ}},
 			{GeneratorMode.CompareIgnoreReturnType, new[] {X, X, X}},
-			{GeneratorMode.InheriteDoc            , new[] {ˑ, X, ˑ}},
-			{GeneratorMode.Signature              , new[] {X, X, ˑ}}, // modifiers "ref", "out", but not "params"
-			{GeneratorMode.Call                   , new[] {ˑ, ˑ, X}},
+			{GeneratorMode.InheriteDoc            , new[] {X, X, ˑ}}, // modifiers "ref", "out", but not "this", "params"
+			{GeneratorMode.Signature              , new[] {X, X, ˑ}}, // modifiers "ref", "out", but not "this", "params"
+			{GeneratorMode.Call                   , new[] {X, ˑ, X}}, // modifiers "ref", "out", but not "this", "params"
 			{GeneratorMode.Declare                , new[] {X, X, X}},
 		};
 

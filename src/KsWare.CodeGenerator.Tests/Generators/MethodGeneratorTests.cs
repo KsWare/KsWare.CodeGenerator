@@ -135,6 +135,8 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 
 		#endregion
 
+		#region generic class
+
 		public class GenericClass1<T> {
 			public T RM1() { return default; }
 			public T[] RM2() { return default; }
@@ -190,6 +192,10 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 			Generator.ForCompare.Generate(mi).Should().Be(result);
 		}
 
+		#endregion
+
+		#region operators
+
 #pragma warning disable 660,661
 		class Op { //TODO overload operator
 
@@ -238,6 +244,10 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 		}
 #pragma warning restore 660,661
 
+		#endregion
+
+		#region Extension
+
 		[DataTestMethod]
 		[DataRow(typeof(Extensions), "A", "public static void A(this KsWare.CodeGenerator.Tests.Generators.ExtendedClass extended)")]
 		public void Extension_ForDeclare_Test(Type type, string name, string result) {
@@ -266,7 +276,57 @@ namespace KsWare.CodeGenerator.Tests.Generators {
 			Generator.ForInheriteDoc.Generate(mi).Should().Be(result);
 		}
 
+		#endregion
+
+		#region Generic methods
+
 		//TODO GenericMethod<T>
+
+		class GenericMethods {
+
+			public T A<T>(T a) => default;
+			public T2 B<T1, T2>(T1 a, T2 b) => default;
+			public T C<T>(ref T a, out T b, params T[] c) { b = default; return default; }
+
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(GenericMethods), "A", "public T A<T>(T a)")]
+		[DataRow(typeof(GenericMethods), "B", "public T2 B<T1, T2>(T1 a, T2 b)")]
+		[DataRow(typeof(GenericMethods), "C", "public T C<T>(ref T a, out T b, params T[] c)")]
+		public void GenericMethods_ForDeclare_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForDeclare.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(GenericMethods), "A", "A<T>(T)")]
+		[DataRow(typeof(GenericMethods), "B", "B<T1, T2>(T1, T2)")]
+		[DataRow(typeof(GenericMethods), "C", "C<T>(ref T, out T, T[])")]
+		public void GenericMethods_ForSignature_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForSignature.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(GenericMethods), "A", "A<T>(a)")]
+		[DataRow(typeof(GenericMethods), "B", "B<T1, T2>(a, b)")]
+		[DataRow(typeof(GenericMethods), "C", "C<T>(ref a, out b, c)")]
+		public void GenericMethods_ForCall_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForCall.Generate(mi).Should().Be(result);
+		}
+
+		[DataTestMethod]
+		[DataRow(typeof(GenericMethods), "A", "A{T}(T)")]
+		[DataRow(typeof(GenericMethods), "B", "B{T1, T2}(T1, T2)")]
+		[DataRow(typeof(GenericMethods), "C", "C{T}(ref T, out T, T[])")]
+		public void GenericMethods_ForInheriteDoc_Test(Type type, string name, string result) {
+			var mi = (MethodInfo) type.GetMember(name, AllBindingFlags)[0];
+			Generator.ForInheriteDoc.Generate(mi).Should().Be(result);
+		}
+
+		#endregion
 
 	}
 

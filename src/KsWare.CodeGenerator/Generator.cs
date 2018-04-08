@@ -184,6 +184,7 @@ namespace KsWare.CodeGenerator {
 		/// <param name="attr">The attribute.</param>
 		/// <returns>System.String.</returns>
 		public string Modifier(MethodAttributes attr) {
+			// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#methods
 			/*
 				ReuseSlot = 0,
 			    Final = 32, // 0x00000020
@@ -203,6 +204,26 @@ namespace KsWare.CodeGenerator {
 				HasSecurity = 16384, // 0x00004000
 				RequireSecObject = 32768, // 0x00008000
 			 */
+
+			// TODO 'partial'
+
+			/*	 method_modifier
+				: 'new'
+				| 'public'		\
+				| 'protected'   | access
+				| 'internal'    |
+				| 'private'     /
+				| 'static'
+				| 'virtual'
+				| 'sealed'
+				| 'override'
+				| 'abstract'
+				| 'extern'
+				| 'async'			//TODO async
+				| method_modifier_unsafe
+				;
+			*/
+
 			var sb = new StringBuilder();
 			const uint @virtual = (uint) MA.Virtual;
 			const uint @newslot = (uint) MA.NewSlot;

@@ -50,8 +50,9 @@ namespace KsWare.CodeGenerator.Generators {
 
 			if (options.Access    ) sb.Append(Generator.Access  (methodInfo.Attributes));
 			if (options.Modifiers ) sb.Append(Generator.Modifier(methodInfo.Attributes));
-			if (options.ReturnType) sb.Append(Generator.Generate        (methodInfo.ReturnType) + " ");
+			if (options.ReturnType) sb.Append(Generator.Generate(methodInfo.ReturnType) + " ");
 			if (options.Name      ) sb.Append(methodInfo.Name);
+			if(methodInfo.IsGenericMethod) sb.Append("<" + Generator.Generate(methodInfo.GetGenericArguments()) + ">");
 
 			//TODO use options
 			sb.Append("(");
@@ -60,7 +61,10 @@ namespace KsWare.CodeGenerator.Generators {
 
 			if (sb.ToString() == "protected override void Finalize()")
 				return $"~{methodInfo.DeclaringType.Name}()"; // Destructor
-			return sb.ToString();
+
+			return GeneratorMode == GeneratorMode.InheriteDoc 
+				? sb.ToString().Replace("<", "{").Replace(">", "}") 
+				: sb.ToString();
 		}
 
 		/// <summary>
